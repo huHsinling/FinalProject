@@ -110,30 +110,34 @@ Course(electiveCnt + 201, name, credit, scoreVari, assignedProb, false, 0){
 */
 class Player{
     protected:
-        string name;
-        vector<Course*> courselist;
-        vector<Course*> passcourse;
-        int courseCnt;
-        int totalCredit;
-        int mood;
-        int basicScore;
+        const string name;//玩家名稱
+        vector<Course*> courselist;//本學期修課列表
+        vector<Course*> passcourse;//已通過課程列表
+        int totalCredit;//已修學分數
+        int mood;//心情值
+        int basicScore;//基本分數，由課程數量決定
         int week;//目前在第幾週
     public:
         Player(string n);
         int getBasicscore();
-        void changeScore(int ID, int scorechange);
-        bool changeMood(int moodchange);
-        void addcourse(Course& choosedcourse);
-        void addPasscourse(Course& passcourse);
+        int getWeek() const {return week;}
+        void changeScore(int ID, int scorechange);//改變某課程的分數
+        bool changeMood(int moodchange);//改變心情值
+        void addcourse(Course& choosedcourse);//將課程加入 courselist
+        void addPasscourse(Course& passcourse);//將課程加入 passcourse
         void countpassfail();
         void clearcourse();
-        void move(int step);//丟骰後移動到第幾格
+        void move(int step);//丟骰後移動 step 格
+        void moveToWeek(int week);//移動到第 week 格
 };
 Player::Player(string n):name(n){
+    totalCredit = 0;
     mood = 100;
+    basicScore = 0;
+    week = 0;
 }
 int Player::getBasicscore(){
-    return 80 - totalCredit * 5;
+    return 80 - totalCredit * 5;//應該只計算這學期的吧？
 }
 void Player::addcourse(Course& choosedcourse){
     Course* thecourse = new Course (choosedcourse);
@@ -184,110 +188,29 @@ void Player::countpassfail(){
 }
 
 void Player::move(int step){
-    week = step;
+    week += step;
 }
 
-class TimeMap
-{
-    private:
-        string semester[17];
-        int stepCnt;
-        int dizeTime;
-        const int semesterNum;
-        int process;
-    public:
-        TimeMap(int PlayNum);
-        void print();
-        void printForm();
-        int getstepCnt();
-        int getsemesterNum() const;
-        int getprocess();
-        ~TimeMap();
-};
-TimeMap:: TimeMap(int PlayNum) : semesterNum(PlayNum)
-{
-    stepCnt = 0;
-    dizeTime = 0;
-    process = 1;
-    for(int i=0; i<17; i++)
-    {
-           semester[i] = "week"+to_string(i);
-    }
+void Player::moveToWeek(int week){
+    this->week = week;
 }
-TimeMap::~TimeMap()
-{}
-int TimeMap::getstepCnt()
-{
-    return stepCnt;
-}
-int TimeMap::getsemesterNum() const
-{
-    return semesterNum;
-}
-int TimeMap::getprocess()
-{
-    return process;
-}
-void TimeMap::printForm()
-{
-    for(int i = 0; i<8; i++)
-        cout<<semester[i]<<" ";
-    cout<<endl;
-    for(int i = 8; i<17; i++)
-        cout<<semester[i]<<" ";
-}
-void TimeMap::print()
-{
-    cout<<"press y or Y to throw the dice"<<endl;
-    int step = 0;
-    string throwDize;
-    cin>>throwDize;
-    if(process<=this->getsemesterNum())
-    {
-        if(throwDize== string("Y") or throwDize == string("y"))
-        {
-            if(dizeTime!=0)
-            {
-                semester[stepCnt].erase(0,1);
-                step = 1 + rand()%3;
-                stepCnt += step;
-                if(stepCnt>16)
-                    stepCnt = 16;
-                semester[stepCnt] = "*" + semester[stepCnt];
-            }
-            else
-                semester[stepCnt] = "*" + semester[stepCnt];
-            printForm();
-            dizeTime++;
-            if(stepCnt==16)
-            {   
-                semester[16].erase(0,1);
-                dizeTime = 0;
-                stepCnt = 0;
-                process++;
-            }
 
-        }
-        else
-            cout<<"Please type again"<<endl;
-    }
-    cout<<endl;
-}
+const int MAX_WEEK_NUM = 18;
 
 class Game{
 private:
-    int totalSemester;//總共幾學期
+    const int weekNum;//一學期有幾個禮拜
+    vector<string> weeks;//每個禮拜的敘述
+    const int totalSemester;//總共幾學期
     int semester;//目前是第幾學期
-    
-    vector<Events> events;//列表所有事件
+    vector<Events*> events;//列表所有事件
     Player player;//單人玩家
-    TimeMap map;//地圖
 public:
-    Game(int totalSemester);
+    Game(int totalSemester, int weekNum);
     int getSemester() const {return semester;}
-    int getWeek() const {return week;}
     //void Choose();//選課
-    void dice();//丟骰子
+    void dice();//丟骰子，移動
+    void printMap();//印地圖
     void event();//執行事件
     void miniGame();//期中或期末遊戲
     void nextSemester();//進入下一個學期
@@ -295,12 +218,37 @@ public:
     void theEnd();//最終大結算
     
 };
-Game::Game(int totalSemester): totalSemester(totalSemester), semester(1), map(totalSemester), player(/*待補*/){
+Game::Game(int totalSemester, int weekNum): totalSemester(totalSemester), semester(1), weekNum(weekNum), player(/*待補*/){
+    for(int i = 0; i < MAX_WEEK_NUM; i++){
+        weeks.push_back("week" + to_string(i));
+    }
 }
 void Game::dice(){
-    map.print();
-    player.move(get);
+    cout << "press y or Y to throw the dice" << endl;
+    int step = 0;
+    string throwDize;
+    cin >> throwDize;
+    if(throwDize == string("Y") || throwDize == string("y")){
+        step = 1 + rand() % 3;
+        cout << "You moved " << step << (step == 1 ? " step" : " steps");
+    }  
+    else
+        cout << "Please type again" << endl;
+    cout << endl;
+    
+    player.move(step);
+    if(player.getWeek() >= weekNum)
+        player.moveToWeek(weekNum);
 }
+
+void Game::printMap(){
+    int midWeek = weekNum / 2;
+    for(int i = 0; i < weekNum; i++){
+        cout << (i == player.getWeek() ? "*" : "") << weeks[i]; 
+        cout << (i == midWeek ? "\n" : "\t");
+    }
+}
+
 void Game::event(){
     
 }
@@ -322,6 +270,9 @@ int main(){
     Game theGame(totalSemester);
 
     while(theGame.getSemester() <= totalSemester){
+        if(theGame.getWeek() == 0){
+
+        }
         theGame.dice();
         if(theGame.getWeek() == 8){
             theGame.miniGame();

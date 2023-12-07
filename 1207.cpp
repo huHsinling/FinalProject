@@ -5,6 +5,9 @@
 #include<vector>
 using namespace std;
 //1207test
+//這是曾子恩打的
+//I'm a good boy
+//曾子恩建立了一個分支叫bug1然後打了這句話
 
 class Events{
     protected:

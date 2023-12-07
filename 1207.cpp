@@ -9,6 +9,7 @@ using namespace std;
 //I'm a good boy
 <<<<<<< HEAD
 //version2  
+//one
 =======
 >>>>>>> a48d8d21ec79d210e8edc788cb4b760887d58882
 

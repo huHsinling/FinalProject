@@ -20,7 +20,6 @@ class Events{
 };
 Events::Events(string eventName, string eventDetail, int scoreChange, int mood):
 eventName(eventName), eventDetail(eventDetail), scoreChange(scoreChange), mood(mood){
-
 }
 
 string Events::getEventName(){
@@ -45,8 +44,10 @@ public:
     void print() const;
     static void printTitle();
     void changeScore(int score);
-    int getID(){return id;};
-    string getName(){return name;};
+    int getID()const{return id;};
+    int getScore()const{return scoreVari;};
+    string getName()const{return name;};
+    int getCredit()const{ return credit; };
 };
 
 /*class RequiredCourse : public Course{
@@ -64,10 +65,8 @@ public:
     ElectiveCourse(string n, int c, int sv, double ap);
 };
 放到main function
-Course::maxNameLen = 0;
-Course::courseCnt = 0;
-RequiredCourse::requiredCnt = 0;
-ElectiveCourse::electiveCnt = 0;*/
+*/
+
 Course::Course(int id, string name, int credit, int scoreVari, double assignedProb, bool isRequired):
 id(id), name(name), credit(credit), scoreVari(scoreVari), assignedProb(assignedProb), isRequired(isRequired){
     if(name.length() > maxNameLen)
@@ -161,20 +160,17 @@ bool Player::changeMood(int moodchange){
 void Player::changeScore(int ID, int scorechange){
     for(int i = 0; i < courseCnt; i++){
         if(courselist[i]->getID() == ID){
+            courselist[i]->changeScore(scorechange);
             cout << courselist[i]->getName() << scorechange << "points " << endl;
-            cout << "The current score of this class is " << this->getBasicscore() - scorechange[i] >> endl;
+            cout << "The current score of this class is " << this->getBasicscore() + courselist[i]->getScore() << endl;
             return;
         }
     }
-    int random = rand() % (courseCnt);
-    scorechange[random] += scorechange;
-    cout >> coureselist[random].name >> scorechange >> "points" >> endl;
-    return;
 }
 void Player::countpassfail(){
     int basicscore = getBasicscore();
     for(int i = 0; i < courseCnt; i++){
-        int score = basicScore + scorechange[i];
+        int score = basicScore + courselist[i]->getScore();
         cout << courselist[i]->getName() << " Credit: " << courselist[i]->getCredit() << " Score: " << score;
         if(score < 60){
             cout << " Fail" << endl;
@@ -188,7 +184,7 @@ void Player::countpassfail(){
 }
 
 void Player::move(int step){
-    week = 
+    week = step;
 }
 
 class TimeMap
@@ -316,7 +312,8 @@ void Game::miniGame(){
 }
 
 int main(){
-    
+    Course::maxNameLen = 0;
+    Course::courseCnt = 0;
     srand(time(NULL));
     int totalSemester = 0;
     cout << "Customize your semesters in college" << endl;

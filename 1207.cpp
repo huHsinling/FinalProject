@@ -10,8 +10,8 @@ using namespace std;
 //version2  
 //one
 //two
-=======
->>>>>>> a48d8d21ec79d210e8edc788cb4b760887d58882
+
+
 //branchtest!!!
 
 class Events{
@@ -21,16 +21,13 @@ class Events{
         const int scoreChange; //此事件會改變多少分數
         const int mood; //心情值
     public:
-        Events(string eventName, string eventDetail, int scoreChange, int mood);
-        virtual void eventHappened() const = 0; //執行事件
+        Events(string eventName, string eventDetail, int scoreChange, int mood): eventName(eventName), eventDetail(eventDetail), scoreChange(scoreChange), mood(mood)
+        {}
+        void eventHappened() const ; //執行事件
         string getEventName();
         string getEventDetail();
         ~Events(){};
 };
-Events::Events(string eventName, string eventDetail, int scoreChange, int mood):
-eventName(eventName), eventDetail(eventDetail), scoreChange(scoreChange), mood(mood){
-
-}
 
 string Events::getEventName(){
     return eventName;
@@ -38,7 +35,12 @@ string Events::getEventName(){
 string Events::getEventDetail(){
     return eventDetail;
 }
+void Events::eventHappened() const
+{
+    cout<<eventDetail<<endl;
+    
 
+}
 class Course{
 protected:
     const int id;//課程編號

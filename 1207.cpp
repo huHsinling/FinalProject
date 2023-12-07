@@ -7,7 +7,7 @@ using namespace std;
 //1207test
 //這是曾子恩打的
 //I'm a good boy
-//曾子恩建立了一個分支叫bug1然後打了這句話
+//MilkTseng created a branch called "bug1" and wrote down this sentence
 
 class Events{
     protected:

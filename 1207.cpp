@@ -244,7 +244,7 @@ void TimeMap::print()
     cin>>throwDize;
     if(process<=this->getsemesterNum())
     {
-        if(throwDize== string("Y") or throwDize == string("y"))
+        if(throwDize == string("Y") || throwDize == string("y"))
         {
             if(dizeTime!=0)
             {
@@ -285,7 +285,6 @@ private:
 public:
     Game(int totalSemester);
     int getSemester() const {return semester;}
-    int getWeek() const {return week;}
     //void Choose();//選課
     void dice();//丟骰子
     void event();//執行事件

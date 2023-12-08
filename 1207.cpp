@@ -11,10 +11,11 @@ class Events{
         const string eventDetail; //事件敘述，可以加一些故事情節之類的？
         const int scoreChange; //此事件會改變多少分數
         const int mood; //心情值
+        const int type;// type == 0 不做任何事 ； type == 1 or 2 yes or no ; type == 3 選擇課
     public:
-        Events(string eventName, string eventDetail, int scoreChange, int mood): eventName(eventName), eventDetail(eventDetail), scoreChange(scoreChange), mood(mood)
+        Events(string eventName, string eventDetail, int scoreChange, int mood, int type): eventName(eventName), eventDetail(eventDetail), scoreChange(scoreChange), mood(mood), type(type)
         {}
-        void eventHappened() const ; //執行事件
+        int eventHappened() const ; //執行事件
         string getEventName();
         string getEventDetail();
         ~Events(){};
@@ -26,12 +27,12 @@ string Events::getEventName(){
 string Events::getEventDetail(){
     return eventDetail;
 }
-void Events::eventHappened() const
+int Events::eventHappened() const
 {
     cout<<eventDetail<<endl;
-    
-
+    return type;
 }
+
 class Course{
 protected:
     const int id;//課程編號

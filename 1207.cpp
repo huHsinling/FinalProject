@@ -57,7 +57,6 @@ class EventOne : public Events
             string decision;
             cout<<eventDetail<<endl;
             cout<<"Press Y to do or N not to do";
-            cin>>decision;
             cout<<endl;
             while(true)
             {
@@ -82,7 +81,43 @@ class EventOne : public Events
         ~EventOne(){}
         
 };
-
+class EventTwo : public Events
+{
+    protected:
+        const int scorechange1;
+        const int mood1;
+    public:
+        EventTwo(string eventName, string eventDetail, int scoreChange, int mood, int type, int scorechange1, int mood1):  Events(eventName, eventDetail, scoreChange, mood, type), scorechange1(scorechange1), mood1(mood1)
+        {}
+        int eventHappened(int& scoreChange, int& moodChange)
+        {
+            string decision;
+            cout<<eventDetail<<endl;
+            cout<<"Press Y to do or N not to do";
+            cout<<endl;
+            while(true)
+            {
+                cin>>decision;
+                if(decision == "Y" or decision == "y")// yes 回傳
+                {
+                    scoreChange = this->scoreChange;
+                    moodChange = this->mood;
+                    break;
+                }
+                else if(decision == "N" or decision == "n") //no 回傳
+                {
+                    scoreChange = this->scorechange1;
+                    moodChange = this->mood1;
+                    break;
+                }
+                else
+                    cout<<"Input Error. Please type again"<<endl;
+            }
+            return type;
+        }
+        ~EventTwo(){}
+        
+};
 
 class Course{
 protected:

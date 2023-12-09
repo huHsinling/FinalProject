@@ -13,12 +13,12 @@ class Events{
         const int mood; //心情值
         const int type;// type == 0 不做任何事 ； type == 1 yes or no ; type == 2 選擇課
     public:
-        Events(string eventName, string eventDetail, int scoreChange, int mood, int type): eventName(eventName), eventDetail(eventDetail), scoreChange(scoreChange), mood(mood), type(type)
+        Events(string eventName, string eventDetail, int scoreChange, int mood, int type): eventName(eventName), eventDetail(eventDetail), scoreChange(scoreChange), mood(mood),  type(type)
         {}
-        int eventHappened(int& scoreChange, int& moodChange) const ; //執行事件，回傳 type
+        virtual int eventHappened(int& scoreChange, int& moodChange) const = 0; //執行事件，回傳 type
         string getEventName();
         string getEventDetail();
-        ~Events(){};
+        ~Events(){}
 };
 
 string Events::getEventName(){
@@ -34,6 +34,54 @@ int Events::eventHappened(int& scoreChange, int& moodChange) const
     moodChange = this->mood;
     return type;
 }
+class EventDefault: public Events
+{
+    protected:
+
+    public:
+        EventDefault(string eventName, string eventDetail, int scoreChange, int mood, int type): Events(eventName, eventDetail, scoreChange, mood, type)
+        {}
+        ~EventDefault(){}
+
+};
+class EventOne : public Events
+{
+    protected:
+        const int scorechange1;
+        const int mood1;
+    public:
+        EventOne(string eventName, string eventDetail, int scoreChange, int mood, int type, int scorechange1, int mood1): Events(eventName, eventDetail, scoreChange, mood, type), scorechange1(scorechange1), mood1(mood1)
+        {}
+        int eventHappened(int& scoreChange, int& moodChange)
+        {
+            string decision;
+            cout<<eventDetail<<endl;
+            cin>>decision;
+            cout<<endl;
+            while(true)
+            {
+                cin>>decision;
+                if(decision == "Y" or decision == "y")// yes 回傳
+                {
+                    scoreChange = this->scoreChange;
+                    moodChange = this->mood;
+                    break;
+                }
+                else if(decision == "N" or decision == "n") //no 回傳
+                {
+                    scoreChange = this->scorechange1;
+                    moodChange = this->mood1;
+                    break;
+                }
+                else
+                    cout<<"Input Error. Please type again"<<endl;
+            }
+            return type;
+        }
+        ~EventOne(){}
+        
+};
+
 
 class Course{
 protected:

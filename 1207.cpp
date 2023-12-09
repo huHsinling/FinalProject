@@ -56,6 +56,7 @@ class EventOne : public Events
         {
             string decision;
             cout<<eventDetail<<endl;
+            cout<<"Press Y to do or N not to do";
             cin>>decision;
             cout<<endl;
             while(true)

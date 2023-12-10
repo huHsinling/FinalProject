@@ -11,7 +11,7 @@ class Events{
         const string eventDetail; //事件敘述，可以加一些故事情節之類的？
         const int scoreChange; //此事件會改變多少分數
         const int mood; //心情值
-        const int type;// type == 0 不做任何事 ； type == 1 yes or no ; type == 2 選擇課
+        const int type;// type == 0 不做任何事 ； type == 1 yes or no ； type == 2 選擇課 ； type == 3 所有課
     public:
         Events(string eventName, string eventDetail, int scoreChange, int mood, int type): eventName(eventName), eventDetail(eventDetail), scoreChange(scoreChange), mood(mood),  type(type)
         {}
@@ -243,7 +243,9 @@ class Player{
         Player(string n);
         int getBasicscore();
         int getWeek() const {return week;}
+        int getTotalCredit() const {return totalCredit;}
         void changeScore(int ID, int scorechange);//改變某課程的分數
+        void changeAllScore(int scorechange);//改變所有課程的分數
         bool changeMood(int moodchange);//改變心情值
         void addcourse(Course& choosedcourse);//將課程加入 courselist
         void addPasscourse(Course& passcourse);//將課程加入 passcourse
@@ -297,14 +299,25 @@ void Player::changeScore(int ID, int scorechange){
         }
     }
 }
+
+void Player::changeAllScore(int scorechange){
+    for(int i = 0; i < courselist.size(); i++){
+        courselist[i]->changeScore(scorechange);
+        cout << courselist[i]->getName() << scorechange << "points " << endl;
+        cout << "The current score of this class is " << this->getBasicscore() + courselist[i]->getScore() << endl;
+        return;
+    }
+}
+
 void Player::countpassfail(){
-    int basicscore = getBasicscore();
+    int basicScore = getBasicscore();
     Course::printINCTitle();
-    cout << "結果";
+    cout << "分數" << "\t" << "結果";
 
     for(int i = 0; i < courselist.size(); i++){
         int score = basicScore + courselist[i]->getScore();
         courselist[i]->printIdNameCredit();
+        cout << score << "\t";
         if(score < 60){
             cout << "Fail" << endl;
         }
@@ -349,14 +362,15 @@ const int MAX_WEEK_NUM = 18;
 class Game{
 private:
     const int weekNum;//一學期有幾個禮拜
-    vector<string> weeks;//每個禮拜的敘述
+    string weeks[MAX_WEEK_NUM][2];//每個禮拜的敘述
     const int totalSemester;//總共幾學期
     int semester;//目前是第幾學期
+    const int goalCredit;//目標學分數
     vector<Events*> events;//列表所有事件
     vector<Course*> courses;//列表所有課程
     Player player;//單人玩家
 public:
-    Game(int totalSemester, int weekNum, string name);
+    Game(int totalSemester, int weekNum, string name, int goalCredit);
     int getSemester() const {return semester;}
     //void Choose();//選課
     void dice();//丟骰子，移動
@@ -371,10 +385,17 @@ public:
     bool isFinal() const;//玩家是否在期末週
     
 };
-Game::Game(int totalSemester, int weekNum, string name): totalSemester(totalSemester), semester(1), weekNum(weekNum), player(name){
-    for(int i = 0; i < MAX_WEEK_NUM; i++){
-        weeks.push_back("week" + to_string(i));
+Game::Game(int totalSemester, int weekNum, string name, int goalCredit):
+totalSemester(totalSemester), semester(1), weekNum(weekNum), player(name), goalCredit(goalCredit){
+    for(int i = 0; i <= weekNum; i++){
+        weeks[i][0] = "第" + to_string(i) + "週";
+        weeks[i][1] = "事件";
     }
+    weeks[0][1] = "選課";
+    //weeks[1][1] = weeks[2][1] = weeks[3][1] = "加退選";
+    weeks[weekNum/2][1] = "期中週";
+    //weeks[weekNum/2 + 1][1] = weeks[weekNum/2 + 2][1] = "停修";
+    weeks[weekNum][1] = "期末週";
 }
 void Game::dice(){
     cout << "press y or Y to throw the dice" << endl;
@@ -396,10 +417,22 @@ void Game::dice(){
 
 void Game::printMap(){
     int midWeek = weekNum / 2;
-    for(int i = 0; i < weekNum; i++){
-        cout << (i == player.getWeek() ? "*" : "") << weeks[i]; 
-        cout << (i == midWeek ? "\n" : "\t");
+    for(int i = 0; i <= midWeek; i++){
+        cout << (i == player.getWeek() ? "*" : "") << weeks[i][0] << "\t";
     }
+    cout << endl;
+    for(int i = 0; i <= midWeek; i++){
+        cout <<  weeks[i][1] << "\t";
+    }
+    cout << endl;
+    for(int i = midWeek + 1; i <= weekNum; i++){
+        cout << (i == player.getWeek() ? "*" : "") << weeks[i][0] << "\t";
+    }
+    cout << endl;
+    for(int i = midWeek + 1; i <= weekNum; i++){
+        cout <<  weeks[i][1] << "\t";
+    }
+    cout << endl;
 }
 
 void Game::event(){
@@ -411,6 +444,8 @@ void Game::event(){
     //type = 0 or 1: 隨機選一堂課
     if(type == 0 || 1){
         id = player.randomID();
+        player.changeScore(id, scoreChange);
+        player.changeMood(moodChange);
     }
 
     //type = 2: 請玩家選擇課程
@@ -424,17 +459,39 @@ void Game::event(){
             else
                 cout << "課程不存在，請再輸入一次" << endl;
         }
+        player.changeScore(id, scoreChange);
+        player.changeMood(moodChange);
     }
 
-    player.changeScore(id, scoreChange);
-    player.changeMood(moodChange);
-    
+    //type = 3: 所有課程
+    else if(type == 3){
+        player.changeAllScore(scoreChange);
+        player.changeMood(moodChange);
+    }
+
 }
 void Game::nextSemester(){
     semester++;
 }
 void Game::miniGame(){
 
+}
+
+void Game::countPassFail(){
+    cout << "期末結算" << endl;
+    player.countpassfail();
+}
+
+void Game::theEnd(){
+    cout << "畢業結算" << endl;
+    cout << "目標學分：" << goalCredit << endl;
+    cout << "總學分：" << player.getTotalCredit() << endl;
+    if(player.getTotalCredit() >= goalCredit){
+        cout << "恭喜你成功畢業！" << endl;
+    }
+    else{
+        cout << "畢業失敗，請再加油！" << endl;
+    }
 }
 
 bool Game::isWeek0() const{
@@ -453,17 +510,19 @@ bool Game::isFinal() const{
 int main(){
     Course::init();
     srand(time(NULL));
-    int totalSemester = 8, weekNum = 16;
+    int totalSemester = 8, weekNum = 16, goalCredit = 64;
     string name;
     cout << "Enter your name" << endl;
     cin >> name;
     /*cout << "Customize your semesters in college" << endl;
     cin >> totalSemester;
     cout << "Customize your weeks per semester" << endl;
-    cin >> weekNum;*/
+    cin >> weekNum;//需小於 MAX_WEEK_NUM = 18
+    cout << "Customize your goal of credits" << endl;
+    cin >> goalCredit;*/
     
 
-    Game theGame(totalSemester, weekNum, name);
+    Game theGame(totalSemester, weekNum, name, goalCredit);
 
     while(theGame.getSemester() <= totalSemester){
         if(theGame.isWeek0()){

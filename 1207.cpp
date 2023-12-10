@@ -467,18 +467,17 @@ void Game::printMap(){
 void Game::event(){
     int index = rand() % events.size();
     int scoreChange = 0, moodChange = 0;
-    //0 or 1: 隨機選一堂課。2: 請玩家選擇課程。3: 所有課程
+    /*0 or 1: 隨機選一堂課
+    2: 請玩家選擇課程
+    3: 所有課程*/
     int type = events[index]->eventHappened(scoreChange, moodChange);
     int id = 0;
 
-    
     if(type == 0 || 1){
         id = player.randomID();
         player.changeScore(id, scoreChange);
         player.changeMood(moodChange);
     }
-
-    
     else if(type == 2){
         cout << "請選擇一堂課，輸入課程代號" << endl;
         player.printCourse();
@@ -492,13 +491,10 @@ void Game::event(){
         player.changeScore(id, scoreChange);
         player.changeMood(moodChange);
     }
-
-    
     else if(type == 3){
         player.changeAllScore(scoreChange);
         player.changeMood(moodChange);
     }
-
 }
 void Game::nextSemester(){
     semester++;

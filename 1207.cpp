@@ -243,6 +243,7 @@ class Player{
         vector<Course*> courselist;//本學期修課列表
         vector<Course*> passcourse;//已通過課程列表
         int totalCredit;//已修學分數
+        int semesterCredit;//本學期學分數
         int mood;//心情值
         int basicScore;//基本分數，由課程數量決定
         int week;//目前在第幾週
@@ -261,7 +262,7 @@ class Player{
         void addcourse(Course& choosedcourse);
         //將課程加入 passcourse
         void addPasscourse(Course& passcourse);
-        //印出期末結算成績單
+        //期末結算
         void countpassfail();
         //回到學期初始狀態(passcourse還在)
         void clearcourse();
@@ -277,18 +278,20 @@ class Player{
         bool idExist(int id) const;
 };
 Player::Player(string n):name(n){
+    semesterCredit = 0;
     totalCredit = 0;
     mood = 100;
     basicScore = 0;
     week = 0;
 }
 int Player::getBasicscore(){
-    basicScore = 80 - totalCredit * 5;//應該只計算這學期的吧？
+    basicScore = 80 - semesterCredit * 5;//應該只計算這學期的吧？
     return basicScore;
 }
 void Player::addcourse(Course& choosedcourse){
     Course* thecourse = new Course (choosedcourse);
     courselist.push_back(thecourse);
+    semesterCredit += choosedcourse.getCredit();
 }
 void Player::addPasscourse(Course& choosedcourse){
     Course* thecourse = new Course (choosedcourse);
@@ -299,6 +302,7 @@ void Player::clearcourse(){
     mood = 100;
     basicScore = 0;
     week = 0;
+    semesterCredit = 0;
 }
 bool Player::changeMood(int moodchange){
     mood += moodchange;

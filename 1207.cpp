@@ -61,13 +61,13 @@ class EventOne : public Events
             while(true)
             {
                 cin>>decision;
-                if(decision == "Y" or decision == "y")// yes 回傳
+                if(decision == "Y" || decision == "y")// yes 回傳
                 {
                     scoreChange = this->scoreChange;
                     moodChange = this->mood;
                     break;
                 }
-                else if(decision == "N" or decision == "n") //no 回傳
+                else if(decision == "N" || decision == "n") //no 回傳
                 {
                     scoreChange = this->scorechange1;
                     moodChange = this->mood1;
@@ -98,13 +98,13 @@ class EventTwo : public Events
             while(true)
             {
                 cin>>decision;
-                if(decision == "Y" or decision == "y")// yes 回傳
+                if(decision == "Y" || decision == "y")// yes 回傳
                 {
                     scoreChange = this->scoreChange;
                     moodChange = this->mood;
                     break;
                 }
-                else if(decision == "N" or decision == "n") //no 回傳
+                else if(decision == "N" || decision == "n") //no 回傳
                 {
                     scoreChange = this->scorechange1;
                     moodChange = this->mood1;
@@ -400,16 +400,16 @@ totalSemester(totalSemester), semester(1), weekNum(weekNum), player(name), goalC
 void Game::dice(){
     cout << "press y or Y to throw the dice" << endl;
     int step = 0;
-    string throwDize;
-    cin >> throwDize;
-    if(throwDize == string("Y") || throwDize == string("y")){
-        step = 1 + rand() % 3;
-        cout << "You moved " << step << (step == 1 ? " step" : " steps");
-    }  
-    else
-        cout << "Please type again" << endl;
-    cout << endl;
-    
+    string throwDice;
+    while(cin >> throwDice){
+        if(throwDice == string("Y") || throwDice == string("y")){
+            step = 1 + rand() % 3;
+            cout << "You moved " << step << (step == 1 ? " step" : " steps") << endl;
+            break;
+        }  
+        else
+            cout << "Please type y or Y to throw the dice" << endl;
+    }
     player.move(step);
     if(player.getWeek() >= weekNum)
         player.moveToWeek(weekNum);

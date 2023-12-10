@@ -601,7 +601,7 @@ int main(){
     char* start;
     Events* EvnPtr;
     default_event.open("eventdefault");
-    while(!default_event.eof())
+    while(!default_event.eof()) //input default
     {
 
         getline(default_event, inputFile, '\n');
@@ -620,7 +620,7 @@ int main(){
     }
     default_event.close();
     Event_one.open("eventone");
-    while(!Event_one.eof())
+    while(!Event_one.eof()) // input Evnetone
     {
         getline(default_event, inputFile, '\n');
         strcpy(file,inputFile.c_str());

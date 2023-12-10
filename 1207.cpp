@@ -72,7 +72,6 @@ class EventOne : public Events
                 }
                 else if(decision == "N" || decision == "n") //no 回傳
                 {
-                    scoreChange = this->scorechange1;
                     moodChange = this->mood1;
                     break;
                 }
@@ -557,7 +556,7 @@ void strToInt(int keyIn[], string numstr){
     string a ;
     for(int i = 0; i < 4; i++){
     a = numstr[i];
-    //keyIn[i] = stoi(a);
+    keyIn[i] = stoi(a);
     }
 }
 void makerand(int answer[]){
@@ -627,7 +626,7 @@ int main(){
     srand(time(NULL));
     int totalSemester = 8, weekNum = 16, goalCredit = 64;
     string name;
-    cout << "Enter your name" << endl;
+    cout << "Enter your name:" << endl;
     cin >> name;
     /*cout << "Customize your semesters in college" << endl;
     cin >> totalSemester;
@@ -635,7 +634,8 @@ int main(){
     cin >> weekNum;//需小於 MAX_WEEK_NUM = 18
     cout << "Customize your goal of credits" << endl;
     cin >> goalCredit;*/
-
+    ifstream event0;
+    event0.open("eventdefault.txt");
     
     Game theGame(totalSemester, weekNum, name, goalCredit);
 
@@ -658,6 +658,6 @@ int main(){
         }
     }
     theGame.theEnd();
-
+    event0.close();
     return 0;
 }

@@ -15,7 +15,8 @@ class Events{
     public:
         Events(string eventName, string eventDetail, int scoreChange, int mood, int type): eventName(eventName), eventDetail(eventDetail), scoreChange(scoreChange), mood(mood),  type(type)
         {}
-        virtual int eventHappened(int& scoreChange, int& moodChange) const = 0; //執行事件，回傳 type
+        //執行事件，回傳 type
+        virtual int eventHappened(int& scoreChange, int& moodChange) const = 0; 
         string getEventName();
         string getEventDetail();
         ~Events(){}
@@ -131,17 +132,23 @@ protected:
     static int courseCnt;//課程數量
 public:
     Course(int id, string n, int c, int sv, double ap, bool ir);
-    void printAll() const;//選課時印出所有課程資訊
-    void printIdName() const;//事件選擇時印出 id 及 name
-    void printIdNameCredit() const;//結算時印出 id, name, credit
-    static void printTitle();//選課時印出所有課程資訊的標題
-    static void printINCTitle();//結算時印出 id, name, credit 的標題
+    //選課時印出所有課程資訊
+    void printAll() const;
+    //事件選擇時印出 id 及 name
+    void printIdName() const;
+    //結算時印出 id, name, credit
+    void printIdNameCredit() const;
+    //選課時印出所有課程資訊的標題
+    static void printTitle();
+    //結算時印出 id, name, credit 的標題
+    static void printINCTitle();
     void changeScore(int score);
     int getID()const{return id;};
     int getScore()const{return scoreVari;};
     string getName()const{return name;};
     int getCredit()const{ return credit; };
-    static void init();//初始化 courseCnt 和 maxNameLen
+    //初始化 courseCnt 和 maxNameLen
+    static void init();
 };
 
 class RequiredCourse : public Course{
@@ -244,18 +251,30 @@ class Player{
         int getBasicscore();
         int getWeek() const {return week;}
         int getTotalCredit() const {return totalCredit;}
-        void changeScore(int ID, int scorechange);//改變某課程的分數
-        void changeAllScore(int scorechange);//改變所有課程的分數
-        bool changeMood(int moodchange);//改變心情值
-        void addcourse(Course& choosedcourse);//將課程加入 courselist
-        void addPasscourse(Course& passcourse);//將課程加入 passcourse
+        //改變某課程的分數
+        void changeScore(int ID, int scorechange);
+        //改變所有課程的分數
+        void changeAllScore(int scorechange);
+        //改變心情值
+        bool changeMood(int moodchange);
+        //將課程加入 courselist
+        void addcourse(Course& choosedcourse);
+        //將課程加入 passcourse
+        void addPasscourse(Course& passcourse);
+        //印出期末結算成績單
         void countpassfail();
+        //回到學期初始狀態(passcourse還在)
         void clearcourse();
-        void move(int step);//丟骰後移動 step 格
-        void moveToWeek(int week);//移動到第 week 格
-        int randomID() const;//回傳 courselist 中隨機一個課程的 id
-        void printCourse() const;//印出 courselist 所有課程的 id 及 name
-        bool idExist(int id) const;//coursrelist 中是否有此課程 id
+        //丟骰後移動 step 格
+        void move(int step);
+        //移動到第 week 格
+        void moveToWeek(int week);
+        //回傳 courselist 中隨機一個課程的 id
+        int randomID() const;
+        //印出 courselist 所有課程的 id 及 name
+        void printCourse() const;
+        //coursrelist 中是否有此課程 id
+        bool idExist(int id) const;
 };
 Player::Player(string n):name(n){
     totalCredit = 0;
@@ -372,17 +391,27 @@ private:
 public:
     Game(int totalSemester, int weekNum, string name, int goalCredit);
     int getSemester() const {return semester;}
-    //void Choose();//選課
-    void dice();//丟骰子，移動
-    void printMap();//印地圖
-    void event();//執行事件
-    void miniGame();//期中或期末遊戲
-    void nextSemester();//進入下一個學期
-    void countPassFail();//結算
-    void theEnd();//最終大結算
-    bool isWeek0() const;//玩家是否在第 0 週
-    bool isMid() const;//玩家是否在期中週
-    bool isFinal() const;//玩家是否在期末週
+    /*void Choose();//選課*/
+    //丟骰子，移動
+    void dice();
+    //印地圖
+    void printMap();
+    //執行事件
+    void event();
+    //期中或期末遊戲
+    void miniGame();
+    //進入下一個學期
+    void nextSemester();
+    //結算
+    void countPassFail();
+    //最終大結算
+    void theEnd();
+    //玩家是否在第 0 週
+    bool isWeek0() const;
+    //玩家是否在期中週
+    bool isMid() const;
+    //玩家是否在期末週
+    bool isFinal() const;
     
 };
 Game::Game(int totalSemester, int weekNum, string name, int goalCredit):
@@ -438,17 +467,18 @@ void Game::printMap(){
 void Game::event(){
     int index = rand() % events.size();
     int scoreChange = 0, moodChange = 0;
+    //0 or 1: 隨機選一堂課。2: 請玩家選擇課程。3: 所有課程
     int type = events[index]->eventHappened(scoreChange, moodChange);
     int id = 0;
 
-    //type = 0 or 1: 隨機選一堂課
+    
     if(type == 0 || 1){
         id = player.randomID();
         player.changeScore(id, scoreChange);
         player.changeMood(moodChange);
     }
 
-    //type = 2: 請玩家選擇課程
+    
     else if(type == 2){
         cout << "請選擇一堂課，輸入課程代號" << endl;
         player.printCourse();
@@ -463,7 +493,7 @@ void Game::event(){
         player.changeMood(moodChange);
     }
 
-    //type = 3: 所有課程
+    
     else if(type == 3){
         player.changeAllScore(scoreChange);
         player.changeMood(moodChange);

@@ -382,7 +382,9 @@ public:
     bool isMid() const;
     //玩家是否在期末週
     bool isFinal() const;
-    
+    //輸入事件
+    void addEventsDefault(string eventName, string eventdetail, int scorechange, int mood, int type);
+    void addEventsOne(string eventName, string eventdetail, int scorechange, int mood, int type, int scorechange1, int mood1);
 };
 Game::Game(int totalSemester, int weekNum, string name, int goalCredit):
 totalSemester(totalSemester), semester(1), weekNum(weekNum), player(name), goalCredit(goalCredit){
@@ -581,85 +583,58 @@ bool Game::isMid() const{
 bool Game::isFinal() const{
     return (player.getWeek() == weekNum ? true : false);
 }
+
+void Game::addEventsDefault(string eventName, string eventdetail, int scorechange, int mood, int type){
+    EventDefault* EvnPtr = new EventDefault(eventName, eventdetail, scorechange, mood, type);
+    events.push_back(EvnPtr);
+}
+void Game::addEventsOne(string eventName, string eventdetail, int scorechange, int mood, int type, int scorechange1, int mood1){
+    EventOne* EvnPtr = new EventOne(eventName, eventdetail, scorechange, mood, type, scorechange1, mood1);
+    events.push_back(EvnPtr);
+}
+
+//initialize static member
 int Course::maxNameLen = 0;
 int Course::courseCnt = 0;
 int RequiredCourse::requiredCnt = 0;
 
 int main(){
-    vector<Events*> AllEvents;
-    ifstream default_event;
-    ifstream Event_one;
-    string eventName;
-    string eventdetail;
-    char file[150];
-    int scorechange = 0;
-    int mood = 0;
-    int type = 0;
-    int scorechange1 = 0;
-    int mood1 = 0;
-    string inputFile;
-    char* start;
-    Events* EvnPtr;
-    default_event.open("eventdefault");
-    while(!default_event.eof()) //input default
-    {
-
-        getline(default_event, inputFile, '\n');
-        strcpy(file,inputFile.c_str());
-        start = strtok(file," ");
-        eventName = string(start);
-        start = strtok(0, " ");
-        eventdetail = string(start);
-        scorechange = atoi(start);
-        start = strtok(0, " ");
-        mood = atoi(start);
-        start = strtok(0, " ");
-        type = atoi(start);
-        EvnPtr = new EventDefault(eventName, eventdetail, scorechange, mood, type);
-        AllEvents.push_back(EvnPtr);
-    }
-    default_event.close();
-    Event_one.open("eventone");
-    while(!Event_one.eof()) // input Evnetone
-    {
-        getline(default_event, inputFile, '\n');
-        strcpy(file,inputFile.c_str());
-        start = strtok(file," ");
-        eventName = string(start);
-        start = strtok(0, " ");
-        eventdetail = string(start);
-        scorechange = atoi(start);
-        start = strtok(0, " ");
-        mood = atoi(start);
-        start = strtok(0, " ");
-        type = atoi(start);
-        strtok(0, " ");
-        scorechange1 = atoi(start);
-        strtok(0, " ");
-        mood1 = atoi(start);
-        EvnPtr = new EventOne(eventName,eventdetail,scorechange,mood, type, scorechange1, mood1);
-        AllEvents.push_back(EvnPtr);
-    }
     Course::init();
     srand(time(NULL));
     int totalSemester = 8, weekNum = 16, goalCredit = 64;
     string name;
     cout << "Enter your name:" << endl;
     cin >> name;
+    Game theGame(totalSemester, weekNum, name, goalCredit);
+
+    ifstream Event_default;
+    ifstream Event_one;
+    Event_default.open("eventdefault.txt");
+    if(Event_default){
+        string eventName, eventDetail;
+        int scoreChange, mood, type;
+        while(Event_default >> eventName >> eventDetail >> scoreChange >> mood >> type){
+            theGame.addEventsDefault(eventName, eventDetail, scoreChange, mood, type);
+        }
+    }
+    Event_one.open("event_one.txt");
+    if(Event_one){
+        string eventName, eventDetail;
+        int scoreChange, scoreChange1, mood, mood1, type;
+        while(Event_default >> eventName >> eventDetail >> scoreChange >> mood >> type){
+            theGame.addEventsOne(eventName, eventDetail, scoreChange, mood, type, scoreChange1, mood1);
+        }
+    }
     /*cout << "Customize your semesters in college" << endl;
     cin >> totalSemester;
     cout << "Customize your weeks per semester" << endl;
     cin >> weekNum;//需小於 MAX_WEEK_NUM = 18
     cout << "Customize your goal of credits" << endl;
     cin >> goalCredit;*/
-    ifstream event0;
-    event0.open("eventdefault.txt");
     
-    Game theGame(totalSemester, weekNum, name, goalCredit);
-
     while(theGame.getSemester() <= totalSemester){
         if(theGame.isWeek0()){
-
+            
         }
         theGame.dice();
         theGame.printMap();
@@ -676,6 +651,7 @@ int main(){
         }
     }
     theGame.theEnd();
-    event0.close();
+    Event_default.close();
+    Event_one.close();
     return 0;
 }

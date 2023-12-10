@@ -382,8 +382,9 @@ public:
     bool isMid() const;
     //玩家是否在期末週
     bool isFinal() const;
-    //輸入事件
+    //輸入event_default
     void addEventsDefault(string eventName, string eventdetail, int scorechange, int mood, int type);
+    //輸入event_one
     void addEventsOne(string eventName, string eventdetail, int scorechange, int mood, int type, int scorechange1, int mood1);
 };
 Game::Game(int totalSemester, int weekNum, string name, int goalCredit):

@@ -603,18 +603,11 @@ int main(){
     default_event.open("eventdefault");
     while(!default_event.eof()) //input default
     {
-
-        getline(default_event, inputFile, '\n');
-        strcpy(file,inputFile.c_str());
-        start = strtok(file," ");
-        eventName = string(start);
-        start = strtok(0, " ");
-        eventdetail = string(start);
-        scorechange = atoi(start);
-        start = strtok(0, " ");
-        mood = atoi(start);
-        start = strtok(0, " ");
-        type = atoi(start);
+        default_event>>eventName;
+        default_event>>eventdetail;
+        default_event>>scorechange;
+        default_event>>mood;
+        default_event>>type;
         EvnPtr = new EventDefault(eventName, eventdetail, scorechange, mood, type);
         AllEvents.push_back(EvnPtr);
     }
@@ -622,21 +615,13 @@ int main(){
     Event_one.open("eventone");
     while(!Event_one.eof()) // input Evnetone
     {
-        getline(default_event, inputFile, '\n');
-        strcpy(file,inputFile.c_str());
-        start = strtok(file," ");
-        eventName = string(start);
-        start = strtok(0, " ");
-        eventdetail = string(start);
-        scorechange = atoi(start);
-        start = strtok(0, " ");
-        mood = atoi(start);
-        start = strtok(0, " ");
-        type = atoi(start);
-        strtok(0, " ");
-        scorechange1 = atoi(start);
-        strtok(0, " ");
-        mood1 = atoi(start);
+        Event_one>>eventName;
+        Event_one>>eventdetail;
+        Event_one>>scorechange;
+        Event_one>>mood;
+        Event_one>>type;
+        Event_one>>scorechange1;
+        Event_one>>mood1;
         EvnPtr = new EventOne(eventName,eventdetail,scorechange,mood, type, scorechange1, mood1);
         AllEvents.push_back(EvnPtr);
     }
@@ -652,8 +637,7 @@ int main(){
     cin >> weekNum;//需小於 MAX_WEEK_NUM = 18
     cout << "Customize your goal of credits" << endl;
     cin >> goalCredit;*/
-    ifstream event0;
-    event0.open("eventdefault.txt");
+
     
     Game theGame(totalSemester, weekNum, name, goalCredit);
 
@@ -676,6 +660,6 @@ int main(){
         }
     }
     theGame.theEnd();
-    event0.close();
+
     return 0;
 }

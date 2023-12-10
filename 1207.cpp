@@ -3,7 +3,9 @@
 #include<string>
 #include<ctime>
 #include<vector>
+#include <cstdlib>
 using namespace std;
+
 
 class Events{
     protected:
@@ -16,7 +18,7 @@ class Events{
         Events(string eventName, string eventDetail, int scoreChange, int mood, int type): eventName(eventName), eventDetail(eventDetail), scoreChange(scoreChange), mood(mood),  type(type)
         {}
         //執行事件，回傳 type
-        virtual int eventHappened(int& scoreChange, int& moodChange) const = 0; 
+        virtual int eventHappened(int& scoreChange, int& moodChange) const; 
         string getEventName();
         string getEventDetail();
         ~Events(){}
@@ -53,7 +55,7 @@ class EventOne : public Events
     public:
         EventOne(string eventName, string eventDetail, int scoreChange, int mood, int type, int scorechange1, int mood1): Events(eventName, eventDetail, scoreChange, mood, type), scorechange1(scorechange1), mood1(mood1)
         {}
-        int eventHappened(int& scoreChange, int& moodChange)
+        int eventHappened(int& scoreChange, int& moodChange) const
         {
             string decision;
             cout<<eventDetail<<endl;
@@ -90,7 +92,7 @@ class EventTwo : public Events
     public:
         EventTwo(string eventName, string eventDetail, int scoreChange, int mood, int type, int scorechange1, int mood1):  Events(eventName, eventDetail, scoreChange, mood, type), scorechange1(scorechange1), mood1(mood1)
         {}
-        int eventHappened(int& scoreChange, int& moodChange)
+        int eventHappened(int& scoreChange, int& moodChange) const
         {
             string decision;
             cout<<eventDetail<<endl;
@@ -251,7 +253,7 @@ class Player{
         Player(string n);
         int getBasicscore();
         int getWeek() const {return week;}
-        int getTotalCredit() const {return totalCredit;}
+        int getTotalCredit() {return totalCredit;}
         //改變某課程的分數
         void changeScore(int ID, int scorechange);
         //改變所有課程的分數
@@ -277,6 +279,7 @@ class Player{
         //coursrelist 中是否有此課程 id
         bool idExist(int id) const;
 };
+
 Player::Player(string n):name(n){
     semesterCredit = 0;
     totalCredit = 0;
@@ -421,7 +424,7 @@ public:
 Game::Game(int totalSemester, int weekNum, string name, int goalCredit):
 totalSemester(totalSemester), semester(1), weekNum(weekNum), player(name), goalCredit(goalCredit){
     for(int i = 0; i <= weekNum; i++){
-        weeks[i][0] = "第" + to_string(i) + "週";
+        weeks[i][0] = "第"+ to_string(i) + "週";
         weeks[i][1] = "事件";
     }
     weeks[0][1] = "選課";
@@ -554,7 +557,7 @@ void strToInt(int keyIn[], string numstr){
     string a ;
     for(int i = 0; i < 4; i++){
     a = numstr[i];
-    keyIn[i] = stoi(a);
+    //keyIn[i] = stoi(a);
     }
 }
 void makerand(int answer[]){
@@ -596,7 +599,7 @@ void Game::theEnd(){
     cout << "目標學分：" << goalCredit << endl;
     cout << "總學分：" << player.getTotalCredit() << endl;
     if(player.getTotalCredit() >= goalCredit){
-        cout << "恭喜你成功畢業！" << endl;
+        //cout << "恭喜你成功畢業！" << endl;
     }
     else{
         cout << "畢業失敗，請再加油！" << endl;
@@ -615,6 +618,9 @@ bool Game::isMid() const{
 bool Game::isFinal() const{
     return (player.getWeek() == weekNum ? true : false);
 }
+int Course::maxNameLen = 0;
+int Course::courseCnt = 0;
+int RequiredCourse::requiredCnt = 0;
 
 int main(){
     Course::init();
@@ -629,8 +635,8 @@ int main(){
     cin >> weekNum;//需小於 MAX_WEEK_NUM = 18
     cout << "Customize your goal of credits" << endl;
     cin >> goalCredit;*/
-    
 
+    
     Game theGame(totalSemester, weekNum, name, goalCredit);
 
     while(theGame.getSemester() <= totalSemester){

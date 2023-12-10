@@ -3,7 +3,8 @@
 #include<string>
 #include<ctime>
 #include<vector>
-#include <cstdlib>
+#include<cstdlib>
+#include<fstream>   
 using namespace std;
 
 
@@ -81,43 +82,6 @@ class EventOne : public Events
             return type;
         }
         ~EventOne(){}
-        
-};
-class EventTwo : public Events
-{
-    protected:
-        const int scorechange1;
-        const int mood1;
-    public:
-        EventTwo(string eventName, string eventDetail, int scoreChange, int mood, int type, int scorechange1, int mood1):  Events(eventName, eventDetail, scoreChange, mood, type), scorechange1(scorechange1), mood1(mood1)
-        {}
-        int eventHappened(int& scoreChange, int& moodChange) const
-        {
-            string decision;
-            cout<<eventDetail<<endl;
-            cout<<"Press Y to do or N not to do";
-            cout<<endl;
-            while(true)
-            {
-                cin>>decision;
-                if(decision == "Y" || decision == "y")// yes 回傳
-                {
-                    scoreChange = this->scoreChange;
-                    moodChange = this->mood;
-                    break;
-                }
-                else if(decision == "N" || decision == "n") //no 回傳
-                {
-                    scoreChange = this->scorechange1;
-                    moodChange = this->mood1;
-                    break;
-                }
-                else
-                    cout<<"Input Error. Please type again"<<endl;
-            }
-            return type;
-        }
-        ~EventTwo(){}
         
 };
 
@@ -622,6 +586,60 @@ int Course::courseCnt = 0;
 int RequiredCourse::requiredCnt = 0;
 
 int main(){
+    vector<Events*> AllEvents;
+    ifstream default_event;
+    ifstream Event_one;
+    string eventName;
+    string eventdetail;
+    char file[150];
+    int scorechange = 0;
+    int mood = 0;
+    int type = 0;
+    int scorechange1 = 0;
+    int mood1 = 0;
+    string inputFile;
+    char* start;
+    Events* EvnPtr;
+    default_event.open("eventdefault");
+    while(!default_event.eof())
+    {
+
+        getline(default_event, inputFile, '\n');
+        strcpy(file,inputFile.c_str());
+        start = strtok(file," ");
+        eventName = string(start);
+        start = strtok(0, " ");
+        eventdetail = string(start);
+        scorechange = atoi(start);
+        start = strtok(0, " ");
+        mood = atoi(start);
+        start = strtok(0, " ");
+        type = atoi(start);
+        EvnPtr = new EventDefault(eventName, eventdetail, scorechange, mood, type);
+        AllEvents.push_back(EvnPtr);
+    }
+    default_event.close();
+    Event_one.open("eventone");
+    while(!Event_one.eof())
+    {
+        getline(default_event, inputFile, '\n');
+        strcpy(file,inputFile.c_str());
+        start = strtok(file," ");
+        eventName = string(start);
+        start = strtok(0, " ");
+        eventdetail = string(start);
+        scorechange = atoi(start);
+        start = strtok(0, " ");
+        mood = atoi(start);
+        start = strtok(0, " ");
+        type = atoi(start);
+        strtok(0, " ");
+        scorechange1 = atoi(start);
+        strtok(0, " ");
+        mood1 = atoi(start);
+        EvnPtr = new EventOne(eventName,eventdetail,scorechange,mood, type, scorechange1, mood1);
+        AllEvents.push_back(EvnPtr);
+    }
     Course::init();
     srand(time(NULL));
     int totalSemester = 8, weekNum = 16, goalCredit = 64;

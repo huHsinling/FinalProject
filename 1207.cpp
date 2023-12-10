@@ -504,7 +504,86 @@ void Game::nextSemester(){
     semester++;
 }
 void Game::miniGame(){
+    void makecopy(int answer[], int Anscopy[]);
+    void strToInt(int keyIn[], string numstr);
+    void makerand(int answer[]);
+    int findA(int Anscopy[], int keyIn[]);
+    int findB(int Anscopy[], int keyIn[]);
 
+    cout<<"Please enter four digits "<<endl;
+    srand(time(NULL));
+    string numstr;
+    int A = 0;
+    int B = 0;
+    int answer[4] = {0};
+    int keyIn[4] = {0};
+    int Anscopy[4] = {0};
+    int tryCnt = 0;
+    makerand(answer);
+    while(A != 4){   
+        tryCnt++;
+        if(tryCnt>20){
+            cout<<"You lose";
+            break;
+        }
+        cin >> numstr;
+        if(numstr.length() != 4){
+            cout << "Please type 4 digits";
+            tryCnt--;
+            continue;
+        }
+        strToInt(keyIn, numstr);
+        makecopy( answer, Anscopy);
+        A = findA( Anscopy, keyIn);
+        B = findB( Anscopy , keyIn);
+        if( A != 4){
+            cout << "<" << A << "A" << B << "B" << ">" << endl;
+            cout << "Remain:" << 20 - tryCnt <<" Please try again"<<endl;
+        }
+        else if( A==4)
+          cout<<"Congratulation!";
+    }
+    return;
+}
+/*底下是minigame會用到的function*/
+void makecopy(int answer[], int Anscopy[]){
+    for(int i = 0; i < 4; i++)
+        Anscopy[i] = answer[i];
+}
+void strToInt(int keyIn[], string numstr){
+    string a ;
+    for(int i = 0; i < 4; i++){
+    a = numstr[i];
+    keyIn[i] = stoi(a);
+    }
+}
+void makerand(int answer[]){
+    for(int i = 0; i < 4; i++)
+            answer[i] = rand()%10;
+}
+int findA(int Anscopy[], int keyIn[]){
+    int A = 0;
+    for(int i = 0; i < 4; i++){
+        if(Anscopy[i] == keyIn[i]){
+            A++;
+            Anscopy[i] = -1;
+            keyIn[i] = -2;
+        }
+    }
+    return A;
+}
+int findB(int Anscopy[], int keyIn[]){
+        int B = 0;
+        for(int i = 0 ; i < 4; i++){
+            for(int j=0; j < 4; j++){
+                if(Anscopy[i] == keyIn[j]){
+                    B++;
+                    keyIn[j] = -2;
+                    Anscopy[i] = -1;
+                }
+            }
+        }
+        return B;
 }
 
 void Game::countPassFail(){

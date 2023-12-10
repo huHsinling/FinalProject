@@ -606,7 +606,7 @@ int main(){
     cout << "Enter your name:" << endl;
     cin >> name;
     Game theGame(totalSemester, weekNum, name, goalCredit);
-
+ 
     ifstream Event_default;
     ifstream Event_one;
     Event_default.open("eventdefault.txt");

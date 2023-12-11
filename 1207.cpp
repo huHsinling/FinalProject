@@ -4,7 +4,6 @@
 #include<ctime>
 #include<vector>
 #include<cstdlib>
-#include<fstream>   
 #include"minigame.h"
 using namespace std;
 
@@ -122,6 +121,7 @@ private:
     static int requiredCnt;//必修課程數量
 public:
     RequiredCourse(string n, int c, int sv, int s);
+    int getSemester() {return semester;}
     static void init();//初始化 requiredCnt
 };
 
@@ -241,6 +241,8 @@ class Player{
         void printCourse() const;
         //coursrelist 中是否有此課程 id
         bool idExist(int id) const;
+        //passcourse 中是否有此課程 id
+        bool isPassed(int id) const;
 };
 
 Player::Player(string n):name(n){
@@ -346,6 +348,14 @@ bool Player::idExist(int id) const{
     return false;
 }
 
+bool Player::isPassed(int id) const{
+    for(int i = 0; i < passcourse.size(); i++){
+        if(id == passcourse[i]->getID())
+            return true;
+    }
+    return false;
+}
+
 const int MAX_WEEK_NUM = 18;
 
 class Game{
@@ -356,12 +366,16 @@ private:
     int semester;//目前是第幾學期
     const int goalCredit;//目標學分數
     vector<Events*> events;//列表所有事件
-    vector<Course*> courses;//列表所有課程
+    vector<RequiredCourse*> requiredCourses;//列表所有必修課程
+    /*vector<ElectiveCourse*> electiveCourses;//列表所有選修課程*/
     Player player;//單人玩家
 public:
     Game(int totalSemester, int weekNum, string name, int goalCredit);
     int getSemester() const {return semester;}
-    /*void Choose();//選課*/
+    //印出本學期課程
+    void printCourse();
+    /*//選課
+    void chooseCourse();*/
     //丟骰子，移動
     void dice();
     //印地圖
@@ -399,6 +413,19 @@ totalSemester(totalSemester), semester(1), weekNum(weekNum), player(name), goalC
     //weeks[weekNum/2 + 1][1] = weeks[weekNum/2 + 2][1] = "停修";
     weeks[weekNum][1] = "期末週";
 }
+
+void Game::printCourse(){
+    cout << "本學期必修課程" << endl;
+    for(int i = 0; i < requiredCourses.size(); i++){
+        if(requiredCourses[i]->getSemester() <= this->semester){
+            if(!player.isPassed(requiredCourses[i]->getID())){
+                requiredCourses[i]->printAll();
+                player.addcourse(*requiredCourses[i]);
+            }
+        }
+    }
+}
+
 void Game::dice(){
     cout << "press y or Y to throw the dice" << endl;
     int step = 0;
@@ -590,7 +617,7 @@ int main(){
     
     while(theGame.getSemester() <= totalSemester){
         if(theGame.isWeek0()){
-            
+            theGame.printCourse();
         }
         theGame.dice();
         theGame.printMap();

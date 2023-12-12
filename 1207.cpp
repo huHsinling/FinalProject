@@ -64,9 +64,9 @@ class EventOne : public Events
         int eventHappened(int& scoreChange, int& moodChange) const
         {
             string decision;
-            cout << "事件發生:";
+            cout << "事件發生:" << endl;
             cout<<eventDetail<<endl;
-            cout<<"Press Y to do or N not to do";
+            cout<<"按 Y 或 N 選擇要不要做";
             cout<<endl;
             while(true)
             {
@@ -83,7 +83,7 @@ class EventOne : public Events
                     break;
                 }
                 else
-                    cout<<"Input Error. Please type again"<<endl;
+                    cout<<"輸入錯誤，請輸入 Y 或 N"<<endl;
             }
             return type;
         }
@@ -281,6 +281,7 @@ void Player::clearcourse(){
 }
 bool Player::changeMood(int moodchange){
     mood += moodchange;
+    cout << "你的心情 " << (moodchange >= 0? "+":"") << moodchange << " 分 ";
     cout << "你的心情值現在是 " << mood << endl << endl;
     if(mood < 0)
         return false;

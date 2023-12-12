@@ -301,10 +301,10 @@ void Player::changeScore(int ID, int scorechange){
 }
 
 void Player::changeAllScore(int scorechange){
+    cout << "所有課程 " << (scorechange >= 0? "+":"") << scorechange << " 分" << endl;
     for(int i = 0; i < courselist.size(); i++){
         courselist[i]->changeScore(scorechange);
-        cout << courselist[i]->getName() << " " << (scorechange >= 0? "+":"") << scorechange << " 分" << endl;
-        cout << courselist[i]->getName() << " 目前的分數為 " << this->getBasicscore() + courselist[i]->getScore() << endl;
+        cout << courselist[i]->getName() << " 分數為 " << this->getBasicscore() + courselist[i]->getScore() << endl;
     }
 }
 
@@ -515,6 +515,24 @@ void Game::event(){
 }
 void Game::nextSemester(){
     semester++;
+    player.clearcourse();
+    cout << "恭喜你結束本學期!" << endl << "請按 Y 或 N 決定是否要進入下學期" << endl;
+    while(true){
+        string decision;
+        cin>> decision;
+        if(decision == "Y" || decision == "y")// yes 回傳
+        {
+            cout << "現在開始第" << semester << "學期 " << endl;
+            break;
+        }
+        else if(decision == "N" || decision == "n") //no 回傳
+        {
+            this->theEnd();
+            break;
+        }
+        else
+            cout<<"輸入錯誤，請輸入 Y 或 N"<<endl;
+    }
 }
 void Game::miniGame(){
     cout << "輸入四個數字" << endl;
@@ -529,7 +547,8 @@ void Game::miniGame(){
     while(A != 4){   
         tryCnt++;
         if(tryCnt>20){
-            cout<<"你失敗了，所有課程被扣10分";
+            cout << endl;
+            cout<<"你失敗了 ";
             player.changeAllScore(-10);
             break;
         }
@@ -546,7 +565,7 @@ void Game::miniGame(){
         if( A != 4){
             cout << "<" << A << "A" << B << "B" << ">" << endl;
             cout << "剩餘次數: " << 20 - tryCnt;
-            if(tryCnt > 17)
+            if(tryCnt > 16)
                 cout << " 沒救了...";
             else if (tryCnt > 10)
                 cout << " 請加油好嘛";  
@@ -562,16 +581,17 @@ void Game::miniGame(){
 
 
 void Game::countPassFail(){
-    cout << "期末結算" << endl;
+    cout << endl;
+    cout << "<期末結算>" << endl;
     player.countpassfail();
 }
 
 void Game::theEnd(){
-    cout << "畢業結算" << endl;
+    cout << "<畢業結算>" << endl;
     cout << "目標學分：" << goalCredit << endl;
     cout << "總學分：" << player.getTotalCredit() << endl;
     if(player.getTotalCredit() >= goalCredit){
-        //cout << "恭喜你成功畢業！" << endl;
+        cout << "恭喜你成功畢業！" << endl;
     }
     else{
         cout << "畢業失敗，請再加油！" << endl;
@@ -617,7 +637,7 @@ int RequiredCourse::requiredCnt = 0;
 int main(){
     Course::init();
     srand(time(NULL));
-    int totalSemester = 8, weekNum = 16, goalCredit = 64;
+    int totalSemester = 1, weekNum = 8, goalCredit = 64;
     string name;
     cout << "請輸入你的姓名: " << endl;
     cin >> name;

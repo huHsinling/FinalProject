@@ -543,10 +543,11 @@ void Game::miniGame(){
     int keyIn[4] = {0};
     int Anscopy[4] = {0};
     int tryCnt = 0;
+    int max = 10+rand()%11;
     makerand(answer);
     while(A != 4){   
         tryCnt++;
-        if(tryCnt>20){
+        if(tryCnt>max){
             cout << endl;
             cout<<"你失敗了 ";
             player.changeAllScore(-10);
@@ -565,9 +566,9 @@ void Game::miniGame(){
         if( A != 4){
             cout << "<" << A << "A" << B << "B" << ">" << endl;
             cout << "剩餘次數: " << 20 - tryCnt;
-            if(tryCnt > 16)
+            if(tryCnt > max-2)
                 cout << " 沒救了...";
-            else if (tryCnt > 10)
+            else if (tryCnt > max-4)
                 cout << " 請加油好嘛";  
             else
                 cout << " 請繼續嘗試";

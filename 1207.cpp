@@ -400,6 +400,10 @@ public:
     void addEventsDefault(string eventName, string eventdetail, int scorechange, int mood, int type);
     //輸入event_one
     void addEventsOne(string eventName, string eventdetail, int scorechange, int mood, int type, int scorechange1, int mood1);
+    //輸入必修課程
+    void addRequiredCourse(string name, int credit, int scoreVari, int semester);
+    /*//輸入選修課程
+    void addElectiveCourse(string name, int credit, int scoreVari, double assignedProb);*/
 };
 Game::Game(int totalSemester, int weekNum, string name, int goalCredit):
 totalSemester(totalSemester), semester(1), weekNum(weekNum), player(name), goalCredit(goalCredit){
@@ -575,6 +579,15 @@ void Game::addEventsOne(string eventName, string eventdetail, int scorechange, i
     EventOne* EvnPtr = new EventOne(eventName, eventdetail, scorechange, mood, type, scorechange1, mood1);
     events.push_back(EvnPtr);
 }
+void Game::addRequiredCourse(string name, int credit, int scoreVari, int semester){
+    RequiredCourse* coursePtr = new RequiredCourse(name, credit, scoreVari, semester);
+    requiredCourses.push_back(coursePtr);
+}
+/*void Game::addElectiveCourse(string name, int credit, int scoreVari, double assignedProb){
+    ElectiveCourse* coursePtr = new RequiredCourse(name, credit, scoreVari, assignedProb);
+    requiredCourses.push_back(coursePtr);
+}*/
+
 
 //initialize static member
 int Course::maxNameLen = 0;
@@ -592,6 +605,7 @@ int main(){
 
     ifstream Event_default;
     ifstream Event_one;
+    ifstream Required_Course;
     Event_default.open("eventdefault.txt");
     if(Event_default){
         string eventName, eventDetail;
@@ -606,6 +620,16 @@ int main(){
         int scoreChange, scoreChange1, mood, mood1, type;
         while(Event_default >> eventName >> eventDetail >> scoreChange >> mood >> type){
             theGame.addEventsOne(eventName, eventDetail, scoreChange, mood, type, scoreChange1, mood1);
+        }
+    }
+    Required_Course.open("RequiredCourses.txt");
+    if(Required_Course){
+        string name;
+        int credit = 0, scoreVari = 0, semester = 0;
+        string ignore;
+        Required_Course >> ignore;
+        while(Required_Course >> credit >> scoreVari >> semester >> name){
+            theGame.addRequiredCourse(name, credit, scoreVari, semester);
         }
     }
     /*cout << "Customize your semesters in college" << endl;

@@ -1,6 +1,7 @@
 #include<iostream>
 #include<string>
-#include<ctime> 
+#include<ctime>
+#include "minigame.h"
 using namespace std;
 
 void makecopy(int answer[], int Anscopy[])

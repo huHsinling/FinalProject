@@ -305,7 +305,6 @@ void Player::changeAllScore(int scorechange){
         courselist[i]->changeScore(scorechange);
         cout << courselist[i]->getName() << " " << (scorechange >= 0? "+":"") << scorechange << " 分" << endl;
         cout << courselist[i]->getName() << " 目前的分數為 " << this->getBasicscore() + courselist[i]->getScore() << endl;
-        return;
     }
 }
 
@@ -327,6 +326,8 @@ void Player::countpassfail(){
             addPasscourse(*courselist[i]);
         }
     }
+    cout << "目前通過總學分數為: " << totalCredit;
+    cout << endl;
     this->clearcourse();
 }
 
@@ -535,7 +536,7 @@ void Game::miniGame(){
         }
         cin >> numstr;
         if(numstr.length() != 4){
-            cout << "請輸入四個數字";
+            cout << "請輸入四個數字" << endl;
             tryCnt--;
             continue;
         }
@@ -546,10 +547,10 @@ void Game::miniGame(){
         if( A != 4){
             cout << "<" << A << "A" << B << "B" << ">" << endl;
             cout << "剩餘次數: " << 20 - tryCnt;
-            if(tryCnt > 10)
-                cout << " 請加油好嘛";
-            else if (tryCnt > 17)
-                cout << " 沒救了...";  
+            if(tryCnt > 17)
+                cout << " 沒救了...";
+            else if (tryCnt > 10)
+                cout << " 請加油好嘛";  
             else
                 cout << " 請繼續嘗試";
             cout << endl;   

@@ -37,6 +37,7 @@ string Events::getEventDetail(){
 }
 int Events::eventHappened(int& scoreChange, int& moodChange) const
 {
+    cout << "事件發生：" << endl;
     cout << eventDetail << endl;
     scoreChange = this->scoreChange;
     moodChange = this->mood;
@@ -63,6 +64,7 @@ class EventOne : public Events
         int eventHappened(int& scoreChange, int& moodChange) const
         {
             string decision;
+            cout << "事件發生:";
             cout<<eventDetail<<endl;
             cout<<"Press Y to do or N not to do";
             cout<<endl;
@@ -279,7 +281,7 @@ void Player::clearcourse(){
 }
 bool Player::changeMood(int moodchange){
     mood += moodchange;
-    cout << "你的心情值現在是 " << mood << endl;
+    cout << "你的心情值現在是 " << mood << endl << endl;
     if(mood < 0)
         return false;
     else
@@ -289,6 +291,7 @@ void Player::changeScore(int ID, int scorechange){
     for(int i = 0; i < courselist.size(); i++){
         if(courselist[i]->getID() == ID){
             courselist[i]->changeScore(scorechange);
+            cout << "分數改變:" << endl;
             cout << courselist[i]->getName() << " " << (scorechange > 0? "+":"") << scorechange << " 分" << endl;
             cout << courselist[i]->getName() << " 目前的分數為 " << this->getBasicscore() + courselist[i]->getScore() << endl;
             return;
@@ -299,7 +302,7 @@ void Player::changeScore(int ID, int scorechange){
 void Player::changeAllScore(int scorechange){
     for(int i = 0; i < courselist.size(); i++){
         courselist[i]->changeScore(scorechange);
-        cout << courselist[i]->getName() << " " << (scorechange > 0? "+":"") << scorechange << " 分" << endl;
+        cout << courselist[i]->getName() << " " << (scorechange >= 0? "+":"") << scorechange << " 分" << endl;
         cout << courselist[i]->getName() << " 目前的分數為 " << this->getBasicscore() + courselist[i]->getScore() << endl;
         return;
     }
@@ -626,7 +629,7 @@ int main(){
     if(Event_one){
         string eventName, eventDetail;
         int scoreChange, scoreChange1, mood, mood1, type;
-        while(Event_default >> eventName >> eventDetail >> scoreChange >> mood >> type >> scoreChange1 >> mood1){
+        while(Event_one >> eventName >> eventDetail >> scoreChange >> mood >> type >> scoreChange1 >> mood1){
             theGame.addEventsOne(eventName, eventDetail, scoreChange, mood, type, scoreChange1, mood1);
         }
     }

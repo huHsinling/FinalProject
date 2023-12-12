@@ -515,7 +515,6 @@ void Game::nextSemester(){
 }
 void Game::miniGame(){
     cout << "輸入四個數字" << endl;
-    srand(time(NULL));
     string numstr;
     int A = 0;
     int B = 0;
@@ -617,14 +616,6 @@ int main(){
     ifstream Event_default;
     ifstream Event_one;
     ifstream Required_Course;
-    Event_default.open("eventdefault.txt");
-    if(Event_default){
-        string eventName, eventDetail;
-        int scoreChange, mood, type;
-        while(Event_default >> eventName >> eventDetail >> scoreChange >> mood >> type){
-            theGame.addEventsDefault(eventName, eventDetail, scoreChange, mood, type);
-        }
-    }
     Event_one.open("event_one.txt");
     if(Event_one){
         string eventName, eventDetail;
@@ -633,6 +624,15 @@ int main(){
             theGame.addEventsOne(eventName, eventDetail, scoreChange, mood, type, scoreChange1, mood1);
         }
     }
+    Event_default.open("eventdefault.txt");
+    if(Event_default){
+        string eventName, eventDetail;
+        int scoreChange, mood, type;
+        while(Event_default >> eventName >> eventDetail >> scoreChange >> mood >> type){
+            theGame.addEventsDefault(eventName, eventDetail, scoreChange, mood, type);
+        }
+    }
+
     Required_Course.open("RequiredCourses.txt");
     if(Required_Course){
         string name;

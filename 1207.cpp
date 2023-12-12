@@ -66,7 +66,7 @@ class EventOne : public Events
             string decision;
             cout << "事件發生:" << endl;
             cout<<eventDetail<<endl;
-            cout<<"按 Y 或 N 選擇要不要做";
+            cout<<"按 Y 或 N 選擇要不要";
             cout<<endl;
             while(true)
             {

@@ -327,6 +327,7 @@ void Player::countpassfail(){
             addPasscourse(*courselist[i]);
         }
     }
+    this->clearcourse();
 }
 
 void Player::move(int step){
@@ -546,11 +547,11 @@ void Game::miniGame(){
             cout << "<" << A << "A" << B << "B" << ">" << endl;
             cout << "剩餘次數: " << 20 - tryCnt;
             if(tryCnt > 10)
-                cout << "請加油好嘛";
+                cout << " 請加油好嘛";
             else if (tryCnt > 17)
-                cout << "沒救了...";  
+                cout << " 沒救了...";  
             else
-                cout << "請繼續嘗試";
+                cout << " 請繼續嘗試";
             cout << endl;   
         }
         else if( A==4)
@@ -665,7 +666,7 @@ int main(){
         theGame.dice();
         theGame.printMap();
         if(theGame.isMid()){
-            cout << "你進入了期中周，現在要玩幾A幾B。如果輸了所有課程將扣10分，贏了則順利度過期中周。";
+            cout << "你進入了期中周，現在要玩幾A幾B。如果輸了所有課程將扣10分，贏了則順利度過期中周。" << endl;
             theGame.miniGame();
         }
         else if(theGame.isFinal()){

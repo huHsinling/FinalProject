@@ -692,6 +692,7 @@ int main(){
             theGame.miniGame();
         }
         else if(theGame.isFinal()){
+            cout << "你進入了期末周，現在要玩幾A幾B(可能有重複數字)。如果輸了所有課程將扣10分。" << endl;
             theGame.miniGame();
             theGame.countPassFail();
             theGame.nextSemester();

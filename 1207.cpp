@@ -565,10 +565,10 @@ void Game::miniGame(){
         B = findB( Anscopy , keyIn);
         if( A != 4){
             cout << "<" << A << "A" << B << "B" << ">" << endl;
-            cout << "剩餘次數: " << 20 - tryCnt;
+            cout << "剩餘次數: " << max - tryCnt;
             if(tryCnt > max-2)
                 cout << " 沒救了...";
-            else if (tryCnt > max-4)
+            else if (tryCnt > max-5)
                 cout << " 請加油好嘛";  
             else
                 cout << " 請繼續嘗試";

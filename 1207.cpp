@@ -64,9 +64,9 @@ class EventOne : public Events
         int eventHappened(int& scoreChange, int& moodChange) const
         {
             string decision;
-            cout << "事件發生:" << endl;
+
             cout<<eventDetail<<endl;
-            cout<<"按 Y 或 N 選擇要不要做";
+
             cout<<endl;
             while(true)
             {
@@ -83,7 +83,7 @@ class EventOne : public Events
                     break;
                 }
                 else
-                    cout<<"輸入錯誤，請輸入 Y 或 N"<<endl;
+                    cout<<"Input Error. Please type again"<<endl;
             }
             return type;
         }
@@ -281,7 +281,6 @@ void Player::clearcourse(){
 }
 bool Player::changeMood(int moodchange){
     mood += moodchange;
-    cout << "你的心情 " << (moodchange >= 0? "+":"") << moodchange << " 分 ";
     cout << "你的心情值現在是 " << mood << endl << endl;
     if(mood < 0)
         return false;
@@ -293,8 +292,8 @@ void Player::changeScore(int ID, int scorechange){
         if(courselist[i]->getID() == ID){
             courselist[i]->changeScore(scorechange);
             cout << "分數改變:" << endl;
-            cout << courselist[i]->getName() << " " << (scorechange >= 0? "+":"") << scorechange << " 分" << endl;
-            cout << courselist[i]->getName() << " 目前的分數為 " << this->getBasicscore() + courselist[i]->getScore() << " 分" << endl;
+            cout << courselist[i]->getName() << " " << (scorechange > 0? "+":"") << scorechange << " 分" << endl;
+            cout << courselist[i]->getName() << " 目前的分數為 " << this->getBasicscore() + courselist[i]->getScore() << endl;
             return;
         }
     }
@@ -312,7 +311,7 @@ void Player::changeAllScore(int scorechange){
 void Player::countpassfail(){
     int basicScore = getBasicscore();
     Course::printINCTitle();
-    cout << "分數" << "\t" << "結果" << endl;
+    cout << "分數" << "\t" << "結果";
 
     for(int i = 0; i < courselist.size(); i++){
         int score = basicScore + courselist[i]->getScore();
@@ -327,10 +326,10 @@ void Player::countpassfail(){
             addPasscourse(*courselist[i]);
         }
     }
-    this->clearcourse();
 }
 
 void Player::move(int step){
+    if(this->week == )
     week += step;
 }
 
@@ -544,14 +543,7 @@ void Game::miniGame(){
         B = findB( Anscopy , keyIn);
         if( A != 4){
             cout << "<" << A << "A" << B << "B" << ">" << endl;
-            cout << "剩餘次數: " << 20 - tryCnt;
-            if(tryCnt > 10)
-                cout << " 請加油好嘛";
-            else if (tryCnt > 17)
-                cout << " 沒救了...";  
-            else
-                cout << " 請繼續嘗試";
-            cout << endl;   
+            cout << "剩餘次數: " << 20 - tryCnt <<" 請繼續嘗試"<<endl;
         }
         else if( A==4)
           cout<<"恭喜你成功!"<<endl;
@@ -658,15 +650,14 @@ int main(){
     cin >> weekNum;//需小於 MAX_WEEK_NUM = 18
     cout << "Customize your goal of credits" << endl;
     cin >> goalCredit;*/
-    cout << "遊戲規則:" << endl << "規則";
-    while(theGame.getSemester() <= totalSemester){
+   while(theGame.getSemester() <= totalSemester){
         if(theGame.isWeek0()){
             theGame.printCourse();
         }
         theGame.dice();
         theGame.printMap();
         if(theGame.isMid()){
-            cout << "你進入了期中周，現在要玩幾A幾B。如果輸了所有課程將扣10分，贏了則順利度過期中周。" << endl;
+            cout << "你進入了期中周，現在要玩幾A幾B。如果輸了所有課程將扣10分，贏了則順利度過期中周。";
             theGame.miniGame();
         }
         else if(theGame.isFinal()){

@@ -377,7 +377,7 @@ private:
 public:
     Game(int totalSemester, int weekNum, string name, int goalCredit);
     int getSemester() const {return semester;}
-    //印出本學期課程
+    //印出本學期課程，並加入player course
     void printCourse();
     /*//選課
     void chooseCourse();*/
@@ -425,6 +425,7 @@ totalSemester(totalSemester), semester(1), weekNum(weekNum), player(name), goalC
 
 void Game::printCourse(){
     cout << "本學期必修課程" << endl;
+    Course::printTitle();
     for(int i = 0; i < requiredCourses.size(); i++){
         if(requiredCourses[i]->getSemester() <= this->semester){
             if(!player.isPassed(requiredCourses[i]->getID())){
@@ -683,7 +684,6 @@ void strToInt(int keyIn[], string numstr)
 }
 void makerand(int answer[])
 {
-    srand(time(NULL));
     for(int i = 0; i < 4; i++)
         answer[i] = rand()%10;
 }

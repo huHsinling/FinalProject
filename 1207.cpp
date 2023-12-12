@@ -176,7 +176,7 @@ void Course::printTitle(){
 
 void Course::printINCTitle(){
     cout << "編號 課程名稱";
-    int n = ((maxNameLen - 8) / 8) + 1;
+    int n = ((maxNameLen - 8) / 8);
     for(int i = 0; i < n; i++)
         cout << "\t";
     cout << "學分" << "\t";
@@ -424,7 +424,7 @@ totalSemester(totalSemester), semester(1), weekNum(weekNum), player(name), goalC
 }
 
 void Game::printCourse(){
-    cout << "本學期必修課程" << endl;
+    cout << "<本學期必修課程>" << endl;
     Course::printTitle();
     for(int i = 0; i < requiredCourses.size(); i++){
         if(requiredCourses[i]->getSemester() <= this->semester){
@@ -437,17 +437,17 @@ void Game::printCourse(){
 }
 
 void Game::dice(){
-    cout << "press y or Y to throw the dice" << endl;
+    cout << "按 y 或 Y 來擲骰子" << endl;
     int step = 0;
     string throwDice;
     while(cin >> throwDice){
         if(throwDice == string("Y") || throwDice == string("y")){
             step = 1 + rand() % 3;
-            cout << "You moved " << step << (step == 1 ? " step" : " steps") << endl;
+            cout << "你移動了 " << step << " 格" << endl;
             break;
         }  
         else
-            cout << "Please type y or Y to throw the dice" << endl;
+            cout << "按 y 或 Y 來擲骰子" << endl;
     }
     player.move(step);
     if(player.getWeek() >= weekNum)
@@ -510,7 +510,7 @@ void Game::nextSemester(){
     semester++;
 }
 void Game::miniGame(){
-    cout << "Please enter four digits " << endl;
+    cout << "輸入四個數字" << endl;
     srand(time(NULL));
     string numstr;
     int A = 0;
@@ -523,12 +523,13 @@ void Game::miniGame(){
     while(A != 4){   
         tryCnt++;
         if(tryCnt>20){
-            cout<<"You lose";
+            cout<<"你失敗了，所有課程被扣10分";
+            
             break;
         }
         cin >> numstr;
         if(numstr.length() != 4){
-            cout << "Please type 4 digits";
+            cout << "請輸入四個數字";
             tryCnt--;
             continue;
         }
@@ -538,10 +539,10 @@ void Game::miniGame(){
         B = findB( Anscopy , keyIn);
         if( A != 4){
             cout << "<" << A << "A" << B << "B" << ">" << endl;
-            cout << "Remain:" << 20 - tryCnt <<" Please try again"<<endl;
+            cout << "剩餘次數: " << 20 - tryCnt <<" 請繼續嘗試"<<endl;
         }
         else if( A==4)
-          cout<<"Congratulation!";
+          cout<<"恭喜你成功!"<<endl;
     }
     return;
 }
@@ -605,7 +606,7 @@ int main(){
     srand(time(NULL));
     int totalSemester = 8, weekNum = 16, goalCredit = 64;
     string name;
-    cout << "Enter your name:" << endl;
+    cout << "請輸入你的姓名: " << endl;
     cin >> name;
     Game theGame(totalSemester, weekNum, name, goalCredit);
 
@@ -624,7 +625,7 @@ int main(){
     if(Event_one){
         string eventName, eventDetail;
         int scoreChange, scoreChange1, mood, mood1, type;
-        while(Event_default >> eventName >> eventDetail >> scoreChange >> mood >> type){
+        while(Event_default >> eventName >> eventDetail >> scoreChange >> mood >> type >> scoreChange1 >> mood1){
             theGame.addEventsOne(eventName, eventDetail, scoreChange, mood, type, scoreChange1, mood1);
         }
     }
@@ -651,6 +652,7 @@ int main(){
         theGame.dice();
         theGame.printMap();
         if(theGame.isMid()){
+            cout << "你進入了期中周，現在要玩幾A幾B。如果輸了所有課程將扣10分，贏了則順利度過期中周。";
             theGame.miniGame();
         }
         else if(theGame.isFinal()){

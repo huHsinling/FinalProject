@@ -329,7 +329,6 @@ void Player::countpassfail(){
 }
 
 void Player::move(int step){
-    if(this->week == )
     week += step;
 }
 

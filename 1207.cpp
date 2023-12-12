@@ -667,7 +667,7 @@ int main(){
         theGame.dice();
         theGame.printMap();
         if(theGame.isMid()){
-            cout << "你進入了期中周，現在要玩幾A幾B。如果輸了所有課程將扣10分，贏了則順利度過期中周。" << endl;
+            cout << "你進入了期中周，現在要玩幾A幾B(可能有重複數字)。如果輸了所有課程將扣10分，贏了則順利度過期中周。" << endl;
             theGame.miniGame();
         }
         else if(theGame.isFinal()){

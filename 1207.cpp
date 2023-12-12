@@ -312,7 +312,7 @@ void Player::changeAllScore(int scorechange){
 void Player::countpassfail(){
     int basicScore = getBasicscore();
     Course::printINCTitle();
-    cout << "分數" << "\t" << "結果";
+    cout << "分數" << "\t" << "結果" << endl;
 
     for(int i = 0; i < courselist.size(); i++){
         int score = basicScore + courselist[i]->getScore();
@@ -544,7 +544,14 @@ void Game::miniGame(){
         B = findB( Anscopy , keyIn);
         if( A != 4){
             cout << "<" << A << "A" << B << "B" << ">" << endl;
-            cout << "剩餘次數: " << 20 - tryCnt <<" 請繼續嘗試"<<endl;
+            cout << "剩餘次數: " << 20 - tryCnt;
+            if(tryCnt > 10)
+                cout << "請加油好嘛";
+            else if (tryCnt > 17)
+                cout << "沒救了...";  
+            else
+                cout << "請繼續嘗試";
+            cout << endl;   
         }
         else if( A==4)
           cout<<"恭喜你成功!"<<endl;

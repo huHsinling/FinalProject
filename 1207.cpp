@@ -279,7 +279,7 @@ void Player::clearcourse(){
 }
 bool Player::changeMood(int moodchange){
     mood += moodchange;
-    cout << "Your mood is now " << mood << endl;
+    cout << "你的心情值現在是 " << mood << endl;
     if(mood < 0)
         return false;
     else
@@ -289,8 +289,8 @@ void Player::changeScore(int ID, int scorechange){
     for(int i = 0; i < courselist.size(); i++){
         if(courselist[i]->getID() == ID){
             courselist[i]->changeScore(scorechange);
-            cout << courselist[i]->getName() << scorechange << "points " << endl;
-            cout << "The current score of this class is " << this->getBasicscore() + courselist[i]->getScore() << endl;
+            cout << courselist[i]->getName() << " " << (scorechange > 0? "+":"") << scorechange << " 分" << endl;
+            cout << courselist[i]->getName() << " 目前的分數為 " << this->getBasicscore() + courselist[i]->getScore() << endl;
             return;
         }
     }
@@ -299,8 +299,8 @@ void Player::changeScore(int ID, int scorechange){
 void Player::changeAllScore(int scorechange){
     for(int i = 0; i < courselist.size(); i++){
         courselist[i]->changeScore(scorechange);
-        cout << courselist[i]->getName() << scorechange << "points " << endl;
-        cout << "The current score of this class is " << this->getBasicscore() + courselist[i]->getScore() << endl;
+        cout << courselist[i]->getName() << " " << (scorechange > 0? "+":"") << scorechange << " 分" << endl;
+        cout << courselist[i]->getName() << " 目前的分數為 " << this->getBasicscore() + courselist[i]->getScore() << endl;
         return;
     }
 }
@@ -472,6 +472,7 @@ void Game::printMap(){
         cout <<  weeks[i][1] << "\t";
     }
     cout << endl;
+    cout << endl;
 }
 
 void Game::event(){
@@ -524,7 +525,7 @@ void Game::miniGame(){
         tryCnt++;
         if(tryCnt>20){
             cout<<"你失敗了，所有課程被扣10分";
-            
+            player.changeAllScore(-10);
             break;
         }
         cin >> numstr;
@@ -635,7 +636,7 @@ int main(){
         int credit = 0, scoreVari = 0, semester = 0;
         string ignore;
         Required_Course >> ignore;
-        while(Required_Course >> credit >> scoreVari >> semester >> name){
+        while(Required_Course >> semester >> credit >> scoreVari >> name){
             theGame.addRequiredCourse(name, credit, scoreVari, semester);
         }
     }

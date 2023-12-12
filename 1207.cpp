@@ -293,8 +293,8 @@ void Player::changeScore(int ID, int scorechange){
         if(courselist[i]->getID() == ID){
             courselist[i]->changeScore(scorechange);
             cout << "分數改變:" << endl;
-            cout << courselist[i]->getName() << " " << (scorechange > 0? "+":"") << scorechange << " 分" << endl;
-            cout << courselist[i]->getName() << " 目前的分數為 " << this->getBasicscore() + courselist[i]->getScore() << endl;
+            cout << courselist[i]->getName() << " " << (scorechange >= 0? "+":"") << scorechange << " 分" << endl;
+            cout << courselist[i]->getName() << " 目前的分數為 " << this->getBasicscore() + courselist[i]->getScore() << " 分" << endl;
             return;
         }
     }
@@ -650,7 +650,8 @@ int main(){
     cin >> weekNum;//需小於 MAX_WEEK_NUM = 18
     cout << "Customize your goal of credits" << endl;
     cin >> goalCredit;*/
-   while(theGame.getSemester() <= totalSemester){
+    cout << "遊戲規則:" << endl << "規則";
+    while(theGame.getSemester() <= totalSemester){
         if(theGame.isWeek0()){
             theGame.printCourse();
         }

@@ -4,8 +4,13 @@
 #include<ctime>
 #include<vector>
 #include<cstdlib>
-#include"minigame.h"
+//#include"minigame.h"
 using namespace std;
+void makecopy(int answer[], int Anscopy[]);
+void strToInt(int keyIn[], std::string numstr);
+void makerand(int answer[]);
+int findA(int Anscopy[], int keyIn[]);
+int findB(int Anscopy[], int keyIn[]);
 
 class Events{
     protected:
@@ -522,7 +527,7 @@ void Game::miniGame(){
             tryCnt--;
             continue;
         }
-        //strToInt(keyIn, numstr);
+        strToInt(keyIn, numstr);
         makecopy( answer, Anscopy);
         A = findA( Anscopy, keyIn);
         B = findB( Anscopy , keyIn);
@@ -614,8 +619,7 @@ int main(){
     cin >> weekNum;//需小於 MAX_WEEK_NUM = 18
     cout << "Customize your goal of credits" << endl;
     cin >> goalCredit;*/
-    
-    while(theGame.getSemester() <= totalSemester){
+   while(theGame.getSemester() <= totalSemester){
         if(theGame.isWeek0()){
             theGame.printCourse();
         }
@@ -637,4 +641,56 @@ int main(){
     Event_default.close();
     Event_one.close();
     return 0;
+}
+
+void makecopy(int answer[], int Anscopy[])
+{
+    for(int i = 0; i < 4; i++)
+        Anscopy[i] = answer[i];
+}
+void strToInt(int keyIn[], string numstr)
+{
+    string a;
+    for(int i = 0; i < 4; i++)
+    {
+       a = numstr[i];
+       keyIn[i] = stoi(a);
+    }
+}
+void makerand(int answer[])
+{
+    srand(time(NULL));
+    for(int i = 0; i < 4; i++)
+        answer[i] = rand()%10;
+}
+int findA(int Anscopy[], int keyIn[])
+{
+   int A = 0;
+   for(int i = 0; i < 4; i++)
+   {
+      if(Anscopy[i] == keyIn[i])
+      {
+         A++;
+         Anscopy[i] = -1;
+         keyIn[i] = -2;
+      }
+   }
+   return A;
+}
+int findB(int Anscopy[], int keyIn[])
+{
+    int B = 0;
+    for(int i = 0 ; i < 4; i++)
+    {
+        for(int j=0; j < 4; j++)
+        {
+            if(Anscopy[i] == keyIn[j])
+            {
+                B++;
+                keyIn[j] = -2;
+                Anscopy[i] = -1;
+            }
+        }
+    }
+    return B;
 }

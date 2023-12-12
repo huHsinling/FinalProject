@@ -19,9 +19,9 @@ void strToInt(int keyIn[], string numstr)
 }
 void makerand(int answer[])
 {
-    //srand(time(NULL));
-    //for(int i = 0; i < 4; i++)
-        //answer[i] = rand()%10;
+    srand(time(NULL));
+    for(int i = 0; i < 4; i++)
+        answer[i] = rand()%10;
 }
 int findA(int Anscopy[], int keyIn[])
 {

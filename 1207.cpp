@@ -293,9 +293,13 @@ void Player::clearcourse(){
     week = 0;
     semesterCredit = 0;
 }
-bool Player::changeMood(int moodchange){
+bool Player::changeMood(int moodchange){   
+    if(moodchange == 0){
+        cout << "沒有心情改變" << endl;
+        return true;
+    }
     mood += moodchange;
-    cout << "你的心情 " << (moodchange >= 0? "+":"") << moodchange << " 分 ";
+    cout << "你的心情 " << (moodchange > 0? "+":"") << moodchange << " 分 ";
     cout << "你的心情值現在是 " << mood << " 分 " << endl << endl;
     if(mood < 0)
         return false;
@@ -303,6 +307,11 @@ bool Player::changeMood(int moodchange){
         return true;
 }
 void Player::changeScore(int ID, int scorechange){
+    if(scorechange == 0){
+        cout << "沒有分數改變" << endl;
+        return;
+    }
+
     for(int i = 0; i < courselist.size(); i++){
         if(courselist[i]->getID() == ID){
             courselist[i]->changeScore(scorechange);
@@ -315,6 +324,11 @@ void Player::changeScore(int ID, int scorechange){
 }
 
 void Player::changeAllScore(int scorechange){
+    if(scorechange == 0){
+        cout << "沒有分數改變" << endl;
+        return;
+    }
+    
     cout << "所有課程 " << (scorechange >= 0? "+":"") << scorechange << " 分" << endl;
     for(int i = 0; i < courselist.size(); i++){
         courselist[i]->changeScore(scorechange);
@@ -342,7 +356,9 @@ bool Player::countpassfail(){
             addPasscourse(*courselist[i]);
         }
     }
+    cout << endl;
     if(passCredit < semesterCredit / 2){
+        cout << "本學期通過學分數/本學期總學分數：" << passCredit << "/" << semesterCredit << endl;
         cout << "你被二一了，遊戲結束" << endl;
         return false;
     }
@@ -445,8 +461,8 @@ public:
     void dice();
     //印地圖
     void printMap();
-    //執行事件
-    void event();
+    //執行事件，心情低於 0 則回傳 false
+    bool event();
     //期中或期末遊戲
     void miniGame();
     //進入下一個學期
@@ -546,7 +562,7 @@ void Game::chooseCourse(){;
         if(isChoosed)
             cout << "課程已選擇，請輸入其他課程，若不再選課請輸入0：";
         else if(!idExist)
-            cout << "課程不存在，請再輸入一次：";
+            cout << "課程不存在，請輸入正確編號，若不再選課請輸入0：";
         else
             cout << "請輸入要選的課程的編號，若不再選課請輸入0：";
         
@@ -598,7 +614,7 @@ void Game::printMap(){
     cout << endl;
 }
 
-void Game::event(){
+bool Game::event(){
     int index = rand() % events.size();
     int scoreChange = 0, moodChange = 0;
     /*0 or 1: 隨機選一堂課
@@ -607,27 +623,32 @@ void Game::event(){
     int type = events[index]->eventHappened(scoreChange, moodChange);
     int id = 0;
 
-    if(type == 0 || type==1){
+    if(type == 0 || type == 1){
         id = player.randomID();
         player.changeScore(id, scoreChange);
-        player.changeMood(moodChange);
     }
     else if(type == 2){
-        cout << "請選擇一堂課，輸入課程代號" << endl;
+        cout << "請選擇一堂課改變分數，輸入課程代號" << endl;
         player.printCourse();
         while(true){
             cin >> id;
             if(player.idExist(id))
                 break;
             else
-                cout << "課程不存在，請再輸入一次" << endl;
+                cout << "課程不存在，請再輸入一次：";
         }
         player.changeScore(id, scoreChange);
-        player.changeMood(moodChange);
     }
     else if(type == 3){
         player.changeAllScore(scoreChange);
-        player.changeMood(moodChange);
+    }
+
+    if(player.changeMood(moodChange)){
+        return true;
+    }
+    else{
+        cout << "心情太差，導致想不開，遊戲結束" << endl;
+        return false;
     }
 }
 bool Game::nextSemester(){
@@ -667,13 +688,13 @@ void Game::miniGame(){
     makerand(answer);
     while(A != 4){   
         tryCnt++;
-        if(tryCnt>max){
+        cin >> numstr;
+        if(tryCnt>max || numstr == "Q" || numstr == "q"){
             cout << endl;
             cout<<"你失敗了 ";
             player.changeAllScore(-10);
             break;
         }
-        cin >> numstr;
         if(numstr.length() != 4){
             cout << "請輸入四個數字" << endl;
             tryCnt--;
@@ -705,7 +726,7 @@ void Game::miniGame(){
                 cout << " 請加油好嘛";  
             else
                 cout << " 請繼續嘗試";
-            cout << endl;   
+            cout << "，按 Q 可放棄" << endl;   
         }
         else if( A==4)
           cout<<"恭喜你成功!"<<endl;
@@ -771,7 +792,7 @@ int ElectiveCourse::electiveCnt = 0;
 
 int main(){
     srand(time(NULL));
-    int totalSemester = 8, weekNum = 8, goalCredit = 64;
+    int totalSemester = 8, weekNum = 8, goalCredit = totalSemester * 8;
     string name;
     cout << "遊戲規則:" << endl << "規則" << endl;
     cout << "請輸入你的姓名: " << endl;
@@ -826,8 +847,7 @@ int main(){
     cin >> totalSemester;
     cout << "Customize your weeks per semester" << endl;
     cin >> weekNum;//需小於 MAX_WEEK_NUM = 18
-    cout << "Customize your goal of credits" << endl;
-    cin >> goalCredit;*/
+    goalCredit = totalSemester * 8*/
 
     while(theGame.getSemester() <= totalSemester){
         if(theGame.isWeek0()){
@@ -849,7 +869,8 @@ int main(){
                 break;            
         }
         else{
-            theGame.event();
+            if(!theGame.event())
+                break;
         }
     }
     theGame.theEnd();

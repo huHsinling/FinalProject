@@ -268,7 +268,7 @@ Player::~Player(){
     }
 }
 int Player::getBasicscore(){
-    basicScore = 80 - semesterCredit * 5;//應該只計算這學期的吧？
+    basicScore = 80 - semesterCredit * 0.5;//應該只計算這學期的吧？
     return basicScore;
 }
 void Player::addcourse(Course& choosedcourse){
@@ -450,7 +450,7 @@ public:
     //期中或期末遊戲
     void miniGame();
     //進入下一個學期
-    void nextSemester();
+    bool nextSemester();
     //結算，被二一則回傳 false
     bool countPassFail();
     //最終大結算
@@ -633,6 +633,10 @@ void Game::event(){
 bool Game::nextSemester(){
     semester++;
     player.clearcourse();
+    if(semester > totalSemester){
+        cout << "恭喜你結束大學生活! 接下來要進行畢業結算" << endl;
+        return false;
+    }
     cout << "恭喜你結束本學期!" << endl << "請按 Y 或 N 決定是否要進入下學期" << endl;
     while(true){
         string decision;
@@ -674,6 +678,19 @@ void Game::miniGame(){
             cout << "請輸入四個數字" << endl;
             tryCnt--;
             continue;
+        }
+        if(numstr.length() == 4){
+            bool wronginput = false;
+            for(int i = 0; i < 4; i++){
+                if(!isdigit(numstr[i])){
+                    cout << "請輸入四個數字" << endl;
+                    wronginput = true;
+                    tryCnt--;
+                    break;
+                }
+            }
+            if(wronginput)
+                continue;
         }
         strToInt(keyIn, numstr);
         makecopy( answer, Anscopy);
@@ -756,6 +773,7 @@ int main(){
     srand(time(NULL));
     int totalSemester = 1, weekNum = 8, goalCredit = 64;
     string name;
+    cout << "遊戲規則:" << endl << "規則" << endl;
     cout << "請輸入你的姓名: " << endl;
     cin >> name;
     Game theGame(totalSemester, weekNum, name, goalCredit);
@@ -810,7 +828,7 @@ int main(){
     cin >> weekNum;//需小於 MAX_WEEK_NUM = 18
     cout << "Customize your goal of credits" << endl;
     cin >> goalCredit;*/
-    cout << "遊戲規則:" << endl << "規則";
+
     while(theGame.getSemester() <= totalSemester){
         if(theGame.isWeek0()){
             theGame.printCourse();
@@ -827,7 +845,8 @@ int main(){
             theGame.miniGame();
             if(!theGame.countPassFail())
                 break;
-            theGame.nextSemester();
+            if(!theGame.nextSemester())
+                break;            
         }
         else{
             theGame.event();

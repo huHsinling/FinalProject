@@ -118,8 +118,6 @@ public:
     int getScore()const{return scoreVari;};
     string getName()const{return name;};
     int getCredit()const{ return credit; };
-    //初始化 courseCnt 和 maxNameLen
-    static void init();
 };
 
 class RequiredCourse : public Course{
@@ -129,17 +127,17 @@ private:
 public:
     RequiredCourse(string n, int c, int sv, int s);
     int getSemester() {return semester;}
-    static void init();//初始化 requiredCnt
 };
 
-/*class ElectiveCourse : public Course{
+class ElectiveCourse : public Course{
 private:
     static int electiveCnt;//選修課程數量
 public:
     ElectiveCourse(string n, int c, int sv, double ap);
+    double getAssignedProb() {return assignedProb;}
     static void init();//初始化 electiveCnt
 };
-*/
+
 
 Course::Course(int id, string name, int credit, int scoreVari, double assignedProb, bool isRequired):
 id(id), name(name), credit(credit), scoreVari(scoreVari), assignedProb(assignedProb), isRequired(isRequired){
@@ -188,32 +186,23 @@ void Course::changeScore(int score){
     scoreVari += score;
 }
 
-void Course::init(){
-    maxNameLen = 0;
-    courseCnt = 0;
-}
-
 RequiredCourse::RequiredCourse(string name, int credit, int scoreVari, int semester):
 Course(requiredCnt + 101, name, credit, scoreVari, 1, true), semester(semester){
     requiredCnt++;
 }
 
-void RequiredCourse::init(){
-    Course::init();
-    requiredCnt = 0;
-}
 
-/*
 ElectiveCourse::ElectiveCourse(string name, int credit, int scoreVari, double assignedProb):
 Course(electiveCnt + 201, name, credit, scoreVari, assignedProb, false){
     electiveCnt++;
 }
-*/
+
 class Player{
     protected:
         const string name;//玩家名稱
         vector<Course*> courselist;//本學期修課列表
         vector<Course*> passcourse;//已通過課程列表
+        vector<ElectiveCourse*> chooseCourse;//選課暫存列表
         int totalCredit;//已修學分數
         int semesterCredit;//本學期學分數
         int mood;//心情值
@@ -221,6 +210,7 @@ class Player{
         int week;//目前在第幾週
     public:
         Player(string n);
+        ~Player();
         int getBasicscore();
         int getWeek() const {return week;}
         int getTotalCredit() {return totalCredit;}
@@ -234,8 +224,10 @@ class Player{
         void addcourse(Course& choosedcourse);
         //將課程加入 passcourse
         void addPasscourse(Course& passcourse);
-        //期末結算
-        void countpassfail();
+        //將課程加入 chooseCourse
+        void addChooseCourse(ElectiveCourse& chooseCourse);
+        //期末結算，被二一則回傳 false
+        bool countpassfail();
         //回到學期初始狀態(passcourse還在)
         void clearcourse();
         //丟骰後移動 step 格
@@ -246,10 +238,16 @@ class Player{
         int randomID() const;
         //印出 courselist 所有課程的 id 及 name
         void printCourse() const;
+        //印出選課結果
+        void printChooseResult();
         //coursrelist 中是否有此課程 id
         bool idExist(int id) const;
         //passcourse 中是否有此課程 id
         bool isPassed(int id) const;
+        //chooseCourse 中是否有此課程 id
+        bool isChoosed(int id) const;
+        //課程分發
+        void assignCourse();
 };
 
 Player::Player(string n):name(n){
@@ -258,6 +256,16 @@ Player::Player(string n):name(n){
     mood = 100;
     basicScore = 0;
     week = 0;
+}
+Player::~Player(){
+    for(int i = 0; i < courselist.size(); i++){
+        delete courselist[i];
+        courselist[i] = nullptr;
+    } 
+    for(int i = 0; i < passcourse.size(); i++){
+        delete passcourse[i];
+        passcourse[i] = nullptr;
+    }
 }
 int Player::getBasicscore(){
     basicScore = 80 - semesterCredit * 5;//應該只計算這學期的吧？
@@ -272,7 +280,13 @@ void Player::addPasscourse(Course& choosedcourse){
     Course* thecourse = new Course (choosedcourse);
     this->passcourse.push_back(thecourse);
 }
+void Player::addChooseCourse(ElectiveCourse& choosedcourse){
+    ElectiveCourse* thecourse = new ElectiveCourse (choosedcourse);
+    this->chooseCourse.push_back(thecourse);
+}
 void Player::clearcourse(){
+    for(int i = 0; i < courselist.size(); i++)
+        delete courselist[i];
     courselist.clear();
     mood = 100;
     basicScore = 0;
@@ -282,7 +296,7 @@ void Player::clearcourse(){
 bool Player::changeMood(int moodchange){
     mood += moodchange;
     cout << "你的心情 " << (moodchange >= 0? "+":"") << moodchange << " 分 ";
-    cout << "你的心情值現在是 " << mood << endl << endl;
+    cout << "你的心情值現在是 " << mood << " 分 " << endl << endl;
     if(mood < 0)
         return false;
     else
@@ -308,10 +322,11 @@ void Player::changeAllScore(int scorechange){
     }
 }
 
-void Player::countpassfail(){
+bool Player::countpassfail(){
     int basicScore = getBasicscore();
     Course::printINCTitle();
     cout << "分數" << "\t" << "結果" << endl;
+    int passCredit = 0;
 
     for(int i = 0; i < courselist.size(); i++){
         int score = basicScore + courselist[i]->getScore();
@@ -322,13 +337,21 @@ void Player::countpassfail(){
         }
         else{
             cout << "Pass" << endl;
+            passCredit += courselist[i]->getCredit();
             totalCredit += courselist[i]->getCredit();
             addPasscourse(*courselist[i]);
         }
     }
-    cout << "目前通過總學分數為: " << totalCredit;
-    cout << endl;
-    this->clearcourse();
+    if(passCredit < semesterCredit / 2){
+        cout << "你被二一了，遊戲結束" << endl;
+        return false;
+    }
+    else{
+        cout << "目前通過總學分數為: " << totalCredit;
+        cout << endl;
+        this->clearcourse();
+        return true;
+    }
 }
 
 void Player::move(int step){
@@ -351,6 +374,15 @@ void Player::printCourse() const{
     }
 }
 
+void Player::printChooseResult(){
+    Course::printINCTitle();
+    cout << "分數" << endl;
+    for(int i = 0; i < courselist.size(); i++){
+        courselist[i]->printIdNameCredit();
+        cout << getBasicscore() + courselist[i]->getScore() << endl;
+    }
+}
+
 bool Player::idExist(int id) const{
     for(int i = 0; i < courselist.size(); i++){
         if(id == courselist[i]->getID())
@@ -367,6 +399,27 @@ bool Player::isPassed(int id) const{
     return false;
 }
 
+bool Player::isChoosed(int id) const{
+    for(int i = 0; i < chooseCourse.size(); i++){
+        if(id == chooseCourse[i]->getID())
+            return true;
+    }
+    return false;
+}
+
+void Player::assignCourse(){
+    for(int i = 0; i < chooseCourse.size(); i++){
+        int prob = rand() % 10;
+        if(prob <= chooseCourse[i]->getAssignedProb() * 10)
+            addcourse(*chooseCourse[i]);
+    }
+    for(int i = 0; i < chooseCourse.size(); i++){
+        delete chooseCourse[i];
+        chooseCourse[i] = nullptr;
+    }
+    chooseCourse.clear();
+}
+
 const int MAX_WEEK_NUM = 18;
 
 class Game{
@@ -378,15 +431,16 @@ private:
     const int goalCredit;//目標學分數
     vector<Events*> events;//列表所有事件
     vector<RequiredCourse*> requiredCourses;//列表所有必修課程
-    /*vector<ElectiveCourse*> electiveCourses;//列表所有選修課程*/
+    vector<ElectiveCourse*> electiveCourses;//列表所有選修課程
     Player player;//單人玩家
 public:
     Game(int totalSemester, int weekNum, string name, int goalCredit);
     int getSemester() const {return semester;}
+    ~Game();
     //印出本學期課程，並加入player course
     void printCourse();
-    /*//選課
-    void chooseCourse();*/
+    //選課
+    void chooseCourse();
     //丟骰子，移動
     void dice();
     //印地圖
@@ -396,9 +450,9 @@ public:
     //期中或期末遊戲
     void miniGame();
     //進入下一個學期
-    bool nextSemester();
-    //結算
-    void countPassFail();
+    void nextSemester();
+    //結算，被二一則回傳 false
+    bool countPassFail();
     //最終大結算
     void theEnd();
     //玩家是否在第 0 週
@@ -413,8 +467,8 @@ public:
     void addEventsOne(string eventName, string eventdetail, int scorechange, int mood, int type, int scorechange1, int mood1);
     //輸入必修課程
     void addRequiredCourse(string name, int credit, int scoreVari, int semester);
-    /*//輸入選修課程
-    void addElectiveCourse(string name, int credit, int scoreVari, double assignedProb);*/
+    //輸入選修課程
+    void addElectiveCourse(string name, int credit, int scoreVari, double assignedProb);
 };
 Game::Game(int totalSemester, int weekNum, string name, int goalCredit):
 totalSemester(totalSemester), semester(1), weekNum(weekNum), player(name), goalCredit(goalCredit){
@@ -429,6 +483,24 @@ totalSemester(totalSemester), semester(1), weekNum(weekNum), player(name), goalC
     weeks[weekNum][1] = "期末週";
 }
 
+Game::~Game(){
+    for(int i = 0; i < events.size(); i++){
+        delete events[i];
+        events[i] = nullptr;
+    }
+    events.clear();
+    for(int i = 0; i < requiredCourses.size(); i++){
+        delete requiredCourses[i];
+        requiredCourses[i] = nullptr;
+    }
+    requiredCourses.clear();
+    for(int i = 0; i < electiveCourses.size(); i++){
+        delete electiveCourses[i];
+        electiveCourses[i] = nullptr;
+    }
+    electiveCourses.clear();
+}
+
 void Game::printCourse(){
     cout << "<本學期必修課程>" << endl;
     Course::printTitle();
@@ -440,20 +512,65 @@ void Game::printCourse(){
             }
         }
     }
+    cout << endl;
+    cout << "<選修課程>" << endl;
+    Course::printTitle();
+    for(int i = 0; i < electiveCourses.size(); i++){
+        if(!player.isPassed(electiveCourses[i]->getID())){
+            electiveCourses[i]->printAll();
+        }
+    }
+}
+
+void Game::chooseCourse(){;
+    cout << "請輸入要選的課程的編號，若不再選課請輸入0：";
+    int id;
+    while(cin >> id){
+        bool idExist = false, isChoosed = false;
+        if(id == 0)
+            break;
+        if(player.isChoosed(id)){
+            isChoosed = true;
+        }
+        else{
+            for(int i = 0; i < electiveCourses.size(); i++){
+                if(electiveCourses[i]->getID() == id){
+                    player.addChooseCourse(*electiveCourses[i]);
+                    cout << "已成功選課 " << electiveCourses[i]->getName() << endl;
+                    idExist = true;
+                    break;
+                }
+            }
+        }
+        
+        if(isChoosed)
+            cout << "課程已選擇，請輸入其他課程，若不再選課請輸入0：";
+        else if(!idExist)
+            cout << "課程不存在，請再輸入一次：";
+        else
+            cout << "請輸入要選的課程的編號，若不再選課請輸入0：";
+        
+    }
+    //由機率決定是否選到課
+    player.assignCourse();
+    cout << endl;
+    //選課結果
+    cout << "<選課結果與初始分數>" << endl;
+    player.printChooseResult();
 }
 
 void Game::dice(){
-    cout << "按 y 或 Y 來擲骰子" << endl;
+    cout << "按 d 或 D 來擲骰子" << endl;
     int step = 0;
     string throwDice;
     while(cin >> throwDice){
-        if(throwDice == string("Y") || throwDice == string("y")){
+        if(throwDice == string("D") || throwDice == string("d")){
             step = 1 + rand() % 3;
             cout << "你移動了 " << step << " 格" << endl;
             break;
         }  
         else
-            cout << "按 y 或 Y 來擲骰子" << endl;
+            cout << "按 d 或 D 來擲骰子" << endl;
     }
     player.move(step);
     if(player.getWeek() >= weekNum)
@@ -580,10 +697,10 @@ void Game::miniGame(){
 }
 
 
-void Game::countPassFail(){
+bool Game::countPassFail(){
     cout << endl;
     cout << "<期末結算>" << endl;
-    player.countpassfail();
+    return player.countpassfail();
 }
 
 void Game::theEnd(){
@@ -623,19 +740,19 @@ void Game::addRequiredCourse(string name, int credit, int scoreVari, int semeste
     RequiredCourse* coursePtr = new RequiredCourse(name, credit, scoreVari, semester);
     requiredCourses.push_back(coursePtr);
 }
-/*void Game::addElectiveCourse(string name, int credit, int scoreVari, double assignedProb){
-    ElectiveCourse* coursePtr = new RequiredCourse(name, credit, scoreVari, assignedProb);
-    requiredCourses.push_back(coursePtr);
-}*/
+void Game::addElectiveCourse(string name, int credit, int scoreVari, double assignedProb){
+    ElectiveCourse* coursePtr = new ElectiveCourse(name, credit, scoreVari, assignedProb);
+    electiveCourses.push_back(coursePtr);
+}
 
 
 //initialize static member
 int Course::maxNameLen = 0;
 int Course::courseCnt = 0;
 int RequiredCourse::requiredCnt = 0;
+int ElectiveCourse::electiveCnt = 0;
 
 int main(){
-    Course::init();
     srand(time(NULL));
     int totalSemester = 1, weekNum = 8, goalCredit = 64;
     string name;
@@ -646,6 +763,7 @@ int main(){
     ifstream Event_default;
     ifstream Event_one;
     ifstream Required_Course;
+    ifstream Elective_Course;
     Event_one.open("event_one.txt");
     if(Event_one){
         string eventName, eventDetail;
@@ -673,6 +791,19 @@ int main(){
             theGame.addRequiredCourse(name, credit, scoreVari, semester);
         }
     }
+
+    Elective_Course.open("ElectiveCourses.txt");
+    if(Elective_Course){
+        string name;
+        int credit = 0, scoreVari = 0;
+        double assignProb = 0;
+        string ignore;
+        Elective_Course >> ignore;
+        while(Elective_Course >> credit >> scoreVari >> assignProb >> name){
+            theGame.addElectiveCourse(name, credit, scoreVari, assignProb);
+        }
+    }
+
     /*cout << "Customize your semesters in college" << endl;
     cin >> totalSemester;
     cout << "Customize your weeks per semester" << endl;
@@ -683,19 +814,20 @@ int main(){
     while(theGame.getSemester() <= totalSemester){
         if(theGame.isWeek0()){
             theGame.printCourse();
+            theGame.chooseCourse();
         }
         theGame.dice();
         theGame.printMap();
         if(theGame.isMid()){
-            cout << "你進入了期中周，現在要玩幾A幾B(可能有重複數字)。如果輸了所有課程將扣10分，贏了則順利度過期中周。" << endl;
+            cout << "你進入了期中周，現在要玩幾A幾B(可能有重複數字)。如果輸了所有課程將扣 10 分，贏了則順利度過期中周。" << endl;
             theGame.miniGame();
         }
         else if(theGame.isFinal()){
-            cout << "你進入了期末周，現在要玩幾A幾B(可能有重複數字)。如果輸了所有課程將扣10分。" << endl;
+            cout << "你進入了期末周，現在要玩幾A幾B(可能有重複數字)。如果輸了所有課程將扣 10 分。" << endl;
             theGame.miniGame();
-            theGame.countPassFail();
-            if(!theGame.nextSemester()) 
+            if(!theGame.countPassFail())
                 break;
+            theGame.nextSemester();
         }
         else{
             theGame.event();
@@ -704,6 +836,8 @@ int main(){
     theGame.theEnd();
     Event_default.close();
     Event_one.close();
+    Required_Course.close();
+    Elective_Course.close();
     return 0;
 }
 

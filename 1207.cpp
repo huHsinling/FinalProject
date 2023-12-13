@@ -607,7 +607,7 @@ void Game::event(){
     int type = events[index]->eventHappened(scoreChange, moodChange);
     int id = 0;
 
-    if(type == 0 || 1){
+    if(type == 0 || type==1){
         id = player.randomID();
         player.changeScore(id, scoreChange);
         player.changeMood(moodChange);
@@ -771,7 +771,7 @@ int ElectiveCourse::electiveCnt = 0;
 
 int main(){
     srand(time(NULL));
-    int totalSemester = 1, weekNum = 8, goalCredit = 64;
+    int totalSemester = 8, weekNum = 8, goalCredit = 64;
     string name;
     cout << "遊戲規則:" << endl << "規則" << endl;
     cout << "請輸入你的姓名: " << endl;

@@ -210,6 +210,7 @@ class Player{
         int week;//目前在第幾週
     public:
         Player(string n);
+        ~Player();
         int getBasicscore();
         int getWeek() const {return week;}
         int getTotalCredit() {return totalCredit;}
@@ -237,7 +238,7 @@ class Player{
         int randomID() const;
         //印出 courselist 所有課程的 id 及 name
         void printCourse() const;
-        //印出選課結果，刪除 chooseCourse
+        //印出選課結果
         void printChooseResult();
         //coursrelist 中是否有此課程 id
         bool idExist(int id) const;
@@ -255,6 +256,16 @@ Player::Player(string n):name(n){
     mood = 100;
     basicScore = 0;
     week = 0;
+}
+Player::~Player(){
+    for(int i = 0; i < courselist.size(); i++){
+        delete courselist[i];
+        courselist[i] = nullptr;
+    } 
+    for(int i = 0; i < passcourse.size(); i++){
+        delete passcourse[i];
+        passcourse[i] = nullptr;
+    }
 }
 int Player::getBasicscore(){
     basicScore = 80 - semesterCredit * 5;//應該只計算這學期的吧？
@@ -274,6 +285,8 @@ void Player::addChooseCourse(ElectiveCourse& choosedcourse){
     this->chooseCourse.push_back(thecourse);
 }
 void Player::clearcourse(){
+    for(int i = 0; i < courselist.size(); i++)
+        delete courselist[i];
     courselist.clear();
     mood = 100;
     basicScore = 0;
@@ -366,9 +379,8 @@ void Player::printChooseResult(){
     cout << "分數" << endl;
     for(int i = 0; i < courselist.size(); i++){
         courselist[i]->printIdNameCredit();
-        cout << basicScore + courselist[i]->getScore() << endl;
+        cout << getBasicscore() + courselist[i]->getScore() << endl;
     }
-    chooseCourse.clear();
 }
 
 bool Player::idExist(int id) const{
@@ -398,10 +410,14 @@ bool Player::isChoosed(int id) const{
 void Player::assignCourse(){
     for(int i = 0; i < chooseCourse.size(); i++){
         int prob = rand() % 10;
-        if(prob <= chooseCourse[i]->getAssignedProb() * 10){
-            courselist.push_back(chooseCourse[i]);
-        }
+        if(prob <= chooseCourse[i]->getAssignedProb() * 10)
+            addcourse(*chooseCourse[i]);
     }
+    for(int i = 0; i < chooseCourse.size(); i++){
+        delete chooseCourse[i];
+        chooseCourse[i] = nullptr;
+    }
+    chooseCourse.clear();
 }
 
 const int MAX_WEEK_NUM = 18;
@@ -420,6 +436,7 @@ private:
 public:
     Game(int totalSemester, int weekNum, string name, int goalCredit);
     int getSemester() const {return semester;}
+    ~Game();
     //印出本學期課程，並加入player course
     void printCourse();
     //選課
@@ -464,6 +481,24 @@ totalSemester(totalSemester), semester(1), weekNum(weekNum), player(name), goalC
     weeks[weekNum/2][1] = "期中週";
     //weeks[weekNum/2 + 1][1] = weeks[weekNum/2 + 2][1] = "停修";
     weeks[weekNum][1] = "期末週";
+}
+
+Game::~Game(){
+    for(int i = 0; i < events.size(); i++){
+        delete events[i];
+        events[i] = nullptr;
+    }
+    events.clear();
+    for(int i = 0; i < requiredCourses.size(); i++){
+        delete requiredCourses[i];
+        requiredCourses[i] = nullptr;
+    }
+    requiredCourses.clear();
+    for(int i = 0; i < electiveCourses.size(); i++){
+        delete electiveCourses[i];
+        electiveCourses[i] = nullptr;
+    }
+    electiveCourses.clear();
 }
 
 void Game::printCourse(){

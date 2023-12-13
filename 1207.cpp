@@ -396,7 +396,7 @@ public:
     //期中或期末遊戲
     void miniGame();
     //進入下一個學期
-    void nextSemester();
+    bool nextSemester();
     //結算
     void countPassFail();
     //最終大結算
@@ -513,7 +513,7 @@ void Game::event(){
         player.changeMood(moodChange);
     }
 }
-void Game::nextSemester(){
+bool Game::nextSemester(){
     semester++;
     player.clearcourse();
     cout << "恭喜你結束本學期!" << endl << "請按 Y 或 N 決定是否要進入下學期" << endl;
@@ -523,12 +523,11 @@ void Game::nextSemester(){
         if(decision == "Y" || decision == "y")// yes 回傳
         {
             cout << "現在開始第" << semester << "學期 " << endl;
-            break;
+            return true;
         }
         else if(decision == "N" || decision == "n") //no 回傳
         {
-            this->theEnd();
-            break;
+            return false;
         }
         else
             cout<<"輸入錯誤，請輸入 Y 或 N"<<endl;
@@ -568,7 +567,7 @@ void Game::miniGame(){
             cout << "剩餘次數: " << max - tryCnt;
             if(tryCnt > max-2)
                 cout << " 沒救了...";
-            else if (tryCnt > max-5)
+            else if (tryCnt > max-6)
                 cout << " 請加油好嘛";  
             else
                 cout << " 請繼續嘗試";
@@ -695,7 +694,8 @@ int main(){
             cout << "你進入了期末周，現在要玩幾A幾B(可能有重複數字)。如果輸了所有課程將扣10分。" << endl;
             theGame.miniGame();
             theGame.countPassFail();
-            theGame.nextSemester();
+            if(!theGame.nextSemester()) 
+                break;
         }
         else{
             theGame.event();

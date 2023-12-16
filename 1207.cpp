@@ -463,20 +463,18 @@ public:
     void printMap();
     //執行事件，心情低於 0 則回傳 false
     bool event();
-    //期中或期末遊戲
-    void miniGame();
+    //期中遊戲
+    void miniGame1();
+    //期末遊戲
+    void miniGame2();
     //進入下一個學期
     bool nextSemester();
     //結算，被二一則回傳 false
     bool countPassFail();
     //最終大結算
     void theEnd();
-    //玩家是否在第 0 週
-    bool isWeek0() const;
-    //玩家是否在期中週
-    bool isMid() const;
-    //玩家是否在期末週
-    bool isFinal() const;
+    //玩家是否在第 week 週
+    bool isWeek(int week) const;
     //輸入event_default
     void addEventsDefault(string eventName, string eventdetail, int scorechange, int mood, int type);
     //輸入event_one
@@ -675,7 +673,66 @@ bool Game::nextSemester(){
             cout<<"輸入錯誤，請輸入 Y 或 N"<<endl;
     }
 }
-void Game::miniGame(){
+
+void Game::miniGame1(){
+    int gcd(int, int);
+    //決定數字
+    srand(time(NULL));
+    int sol1Num = 0, sol1Den = 0, sol2Num = 0, sol2Den = 0;
+    sol1Num = 1 + rand() % 20;
+    sol1Den = 1 + rand() % 10;
+    sol2Num = 1 + rand() % 20;
+    sol2Den = 1 + rand() % 10;
+    //將答案約成最簡分數
+    int gcdSol1 = gcd(sol1Den, sol1Num);
+    int gcdSol2 = gcd(sol2Den, sol2Num);
+    sol1Den /= gcdSol1;
+    sol1Num /= gcdSol1;
+    sol2Den /= gcdSol2;
+    sol2Num /= gcdSol2;
+    //一半的機率改變正負
+    if(rand() % 2 == 0){
+        sol1Num = -sol1Num;
+    }
+    if(rand() % 2 == 0){
+        sol2Num = -sol2Num;
+    }
+    //輸出方程式
+    int a = 0, b = 0, c = 0;
+    a = sol1Den * sol2Den;
+    b = -(sol1Den * sol2Num + sol2Den * sol1Num);
+    c = sol1Num * sol2Num;
+    cout << "提示：必為有理根，輸入格式為 a/b c/d（例如答案為 -3 或 5，則輸入 -3/1 5/1）\n";
+    cout << a << "x^2 ";
+    if(b > 0)
+        cout << "+" << b;
+    else if(b < 0)
+        cout << b;
+    cout << "x ";
+    if(c > 0)
+        cout << "+" << c;
+    else if(c < 0)
+        cout << c;
+    cout << " = 0" << endl;
+    //判斷答案
+    int ans1Num = 0, ans1Den = 0, ans2Num = 0, ans2Den = 0;
+    cin >> ans1Num;
+    cin.ignore();
+    cin >> ans1Den >> ans2Num;
+    cin.ignore();
+    cin >> ans2Den;
+    if(ans1Num == sol1Num && ans1Den == sol1Den && ans2Num == sol2Num && ans2Den == sol2Den)
+        cout << "正確" << endl;
+    else if(ans1Num == sol2Num && ans1Den == sol2Den && ans2Num == sol1Num && ans2Den == sol1Den)
+        cout << "正確" << endl;
+    else{
+        cout << "錯誤" << endl;
+        player.changeAllScore(-10);
+    }
+        
+}
+
+void Game::miniGame2(){
     cout << "輸入四個數字" << endl;
     string numstr;
     int A = 0;
@@ -742,28 +799,35 @@ bool Game::countPassFail(){
 }
 
 void Game::theEnd(){
+    bool allRequiredPass = true;
+    for(int i = 0; i < requiredCourses.size(); i++){
+        if(requiredCourses[i]->getSemester() < this->semester){
+            if(!player.isPassed(requiredCourses[i]->getID())){
+                player.addcourse(*requiredCourses[i]);
+                allRequiredPass = false;
+            }
+        }
+    }
+    
     cout << "<畢業結算>" << endl;
     cout << "目標學分：" << goalCredit << endl;
     cout << "總學分：" << player.getTotalCredit() << endl;
-    if(player.getTotalCredit() >= goalCredit){
-        cout << "恭喜你成功畢業！" << endl;
+    if(player.getTotalCredit() < goalCredit){
+        cout << "學分不足，畢業失敗！" << endl;
+    }
+    else if(!allRequiredPass){
+        cout << "未通過必修：" << endl;
+        player.printCourse();
+        cout << "必修未通過，畢業失敗！" << endl;
     }
     else{
-        cout << "畢業失敗，請再加油！" << endl;
+        cout << "未通過必修：無" << endl;
+        cout << "恭喜你成功畢業！" << endl;
     }
 }
 
-bool Game::isWeek0() const{
-    return (player.getWeek() == 0 ? true : false);
-}
-
-bool Game::isMid() const{
-    int mid = weekNum / 2;
-    return (player.getWeek() == mid ? true : false);
-}
-
-bool Game::isFinal() const{
-    return (player.getWeek() == weekNum ? true : false);
+bool Game::isWeek(int week) const{
+    return (player.getWeek() == week ? true : false);
 }
 
 void Game::addEventsDefault(string eventName, string eventdetail, int scorechange, int mood, int type){
@@ -792,7 +856,7 @@ int ElectiveCourse::electiveCnt = 0;
 
 int main(){
     srand(time(NULL));
-    int totalSemester = 8, weekNum = 8, goalCredit = totalSemester * 8;
+    int totalSemester = 8, weekNum = 16, goalCredit = totalSemester * 8;
     string name;
     cout << "遊戲規則:" << endl << "規則" << endl;
     cout << "請輸入你的姓名: " << endl;
@@ -850,19 +914,19 @@ int main(){
     goalCredit = totalSemester * 8*/
 
     while(theGame.getSemester() <= totalSemester){
-        if(theGame.isWeek0()){
+        if(theGame.isWeek(0)){
             theGame.printCourse();
             theGame.chooseCourse();
         }
         theGame.dice();
         theGame.printMap();
-        if(theGame.isMid()){
-            cout << "你進入了期中周，現在要玩幾A幾B(可能有重複數字)。如果輸了所有課程將扣 10 分，贏了則順利度過期中周。" << endl;
-            theGame.miniGame();
+        if(theGame.isWeek(totalSemester / 2)){
+            cout << "你進入了期中周，現在要解一元二次方程式。如果答錯，所有課程將扣 10 分，答對則順利度過期中周。" << endl;
+            theGame.miniGame1();
         }
-        else if(theGame.isFinal()){
+        else if(theGame.isWeek(totalSemester)){
             cout << "你進入了期末周，現在要玩幾A幾B(可能有重複數字)。如果輸了所有課程將扣 10 分。" << endl;
-            theGame.miniGame();
+            theGame.miniGame2();
             if(!theGame.countPassFail())
                 break;
             if(!theGame.nextSemester())
@@ -930,4 +994,19 @@ int findB(int Anscopy[], int keyIn[])
         }
     }
     return B;
+}
+
+int gcd(int a, int b){
+    if(a >= b){
+        if(b == 0)
+            return a;
+        else
+            return gcd(b, a % b);
+    }
+    else{
+        if(a == 0)
+            return b;
+        else
+            return gcd(a, b % a);
+    }
 }

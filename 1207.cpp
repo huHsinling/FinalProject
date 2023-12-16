@@ -4,7 +4,6 @@
 #include<ctime>
 #include<vector>
 #include<cstdlib>
-
 //#include"minigame.h"
 using namespace std;
 void makecopy(int answer[], int Anscopy[]);

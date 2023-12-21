@@ -920,11 +920,11 @@ int main(){
         }
         theGame.dice();
         theGame.printMap();
-        if(theGame.isWeek(totalSemester / 2)){
+        if(theGame.isWeek(weekNum / 2)){
             cout << "你進入了期中周，現在要解一元二次方程式。如果答錯，所有課程將扣 10 分，答對則順利度過期中周。" << endl;
             theGame.miniGame1();
         }
-        else if(theGame.isWeek(totalSemester)){
+        else if(theGame.isWeek(weekNum)){
             cout << "你進入了期末周，現在要玩幾A幾B(可能有重複數字)。如果輸了所有課程將扣 10 分。" << endl;
             theGame.miniGame2();
             if(!theGame.countPassFail())

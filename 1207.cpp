@@ -714,13 +714,38 @@ void Game::miniGame1(){
     else if(c < 0)
         cout << c;
     cout << " = 0" << endl;
-    //判斷答案
+    //輸入答案
     int ans1Num = 0, ans1Den = 0, ans2Num = 0, ans2Den = 0;
-    cin >> ans1Num;
-    cin.ignore();
-    cin >> ans1Den >> ans2Num;
-    cin.ignore();
-    cin >> ans2Den;
+    string ans, ans1N, ans1D, ans2N, ans2D;
+    int slash1 = 0, slash2 = 0, space = 0;
+    while(true){
+        getline(cin, ans);
+        slash1 = ans.find('/');
+        if(slash1 == string::npos){
+            cout << "輸入格式錯誤（a/b c/d），請再輸入一次" << endl;
+            continue;
+        }
+        space = ans.find(' ', slash1);
+        if(space == string::npos){
+            cout << "輸入格式錯誤（a/b c/d），請再輸入一次" << endl;
+            continue;
+        }
+        slash2 = ans.find('/', space);
+        if(slash2 == string::npos){
+            cout << "輸入格式錯誤（a/b c/d），請再輸入一次" << endl;
+            continue;
+        }
+        break;
+    }
+    ans1N = ans.substr(0, slash1);
+    ans1D = ans.substr(slash1, space - slash1);
+    ans2N = ans.substr(space, slash2 - space);
+    ans2D = ans.substr(slash2);
+    ans1Num = stoi(ans1N);
+    ans1Den = stoi(ans1D);
+    ans2Num = stoi(ans2N);
+    ans2Den = stoi(ans2D);
+    //判斷答案
     if(ans1Num == sol1Num && ans1Den == sol1Den && ans2Num == sol2Num && ans2Den == sol2Den)
         cout << "正確" << endl;
     else if(ans1Num == sol2Num && ans1Den == sol2Den && ans2Num == sol1Num && ans2Den == sol1Den)
@@ -858,7 +883,8 @@ int main(){
     srand(time(NULL));
     int totalSemester = 8, weekNum = 16, goalCredit = totalSemester * 8;
     string name;
-    cout << "遊戲規則:" << endl << "規則" << endl;
+    cout << "歡迎來到「學期大富翁（大學模擬器）」";
+    //cout << "遊戲規則:" << endl << "規則" << endl;
     cout << "請輸入你的姓名: " << endl;
     cin >> name;
     Game theGame(totalSemester, weekNum, name, goalCredit);
@@ -867,7 +893,7 @@ int main(){
     ifstream Event_one;
     ifstream Required_Course;
     ifstream Elective_Course;
-    Event_one.open("event_one.txt");
+    Event_one.open("/Users/tsengzien/FinalProject/event_one.txt");
     if(Event_one){
         string eventName, eventDetail;
         int scoreChange, scoreChange1, mood, mood1, type;
@@ -875,7 +901,7 @@ int main(){
             theGame.addEventsOne(eventName, eventDetail, scoreChange, mood, type, scoreChange1, mood1);
         }
     }
-    Event_default.open("eventdefault.txt");
+    Event_default.open("/Users/tsengzien/FinalProject/eventdefault.txt");
     if(Event_default){
         string eventName, eventDetail;
         int scoreChange, mood, type;
@@ -884,7 +910,7 @@ int main(){
         }
     }
 
-    Required_Course.open("RequiredCourses.txt");
+    Required_Course.open("/Users/tsengzien/FinalProject/RequiredCourses.txt");
     if(Required_Course){
         string name;
         int credit = 0, scoreVari = 0, semester = 0;
@@ -895,7 +921,7 @@ int main(){
         }
     }
 
-    Elective_Course.open("ElectiveCourses.txt");
+    Elective_Course.open("/Users/tsengzien/FinalProject/ElectiveCourses.txt");
     if(Elective_Course){
         string name;
         int credit = 0, scoreVari = 0;

@@ -893,7 +893,7 @@ int main(){
     ifstream Event_one;
     ifstream Required_Course;
     ifstream Elective_Course;
-    Event_one.open("/Users/tsengzien/FinalProject/event_one.txt");
+    Event_one.open("event_one.txt");
     if(Event_one){
         string eventName, eventDetail;
         int scoreChange, scoreChange1, mood, mood1, type;
@@ -901,7 +901,7 @@ int main(){
             theGame.addEventsOne(eventName, eventDetail, scoreChange, mood, type, scoreChange1, mood1);
         }
     }
-    Event_default.open("/Users/tsengzien/FinalProject/eventdefault.txt");
+    Event_default.open("eventdefault.txt");
     if(Event_default){
         string eventName, eventDetail;
         int scoreChange, mood, type;
@@ -910,7 +910,7 @@ int main(){
         }
     }
 
-    Required_Course.open("/Users/tsengzien/FinalProject/RequiredCourses.txt");
+    Required_Course.open("RequiredCourses.txt");
     if(Required_Course){
         string name;
         int credit = 0, scoreVari = 0, semester = 0;
@@ -921,7 +921,7 @@ int main(){
         }
     }
 
-    Elective_Course.open("/Users/tsengzien/FinalProject/ElectiveCourses.txt");
+    Elective_Course.open("ElectiveCourses.txt");
     if(Elective_Course){
         string name;
         int credit = 0, scoreVari = 0;
